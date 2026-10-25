@@ -248,18 +248,39 @@ let VOICE = null, micBlocked = false;
 const MALE = /\b(alvaro|álvaro|jorge|pablo|ra[uú]l|dar[ií]o|gonzalo|tom[aá]s|jos[eé]|arnau|gerardo|liberto|cecilio|andr[eé]s|juan|diego|carlos|enrique|luciano|mateo|alonso|sa[uú]l|teo|rodrigo|emilio|nicol[aá]s|lorenzo|alex|federico|mauricio|sergio|male|hombre)\b/i;
 const FEMALE = /\b(helena|laura|elvira|paloma|sabina|dalia|m[oó]nica|paulina|elena|luc[ií]a|conchita|pen[eé]lope|lupe|ximena|abril|irene|estrella|larissa|marisol|l[ií]a|ver[oó]nica|camila|valentina|catalina|beatriz|carlota|female|mujer)\b|google espa/i;
 const isMale = v => MALE.test(v.name) && !FEMALE.test(v.name);
+const vid = v => v.voiceURI || v.name;
+function vQuality(v){ const t = (v.voiceURI || '') + ' ' + v.name;
+  if (/premium/i.test(t)) return 3; if (/enhanced|mejorad|superior|natural|neural|online/i.test(t)) return 2; return 0; }
+const NOVELTY = /\b(eddy|flo|grandma|grandpa|reed|rocko|sandy|shelley|albert|bad news|bahh|bells|boing|bubbles|cellos|good news|jester|organ|superstar|trinoids|whisper|wobble|zarvox|fred|junior|kathy|ralph|abuel[oa])\b/i;
+const REGION = { ES:'Spain', MX:'Mexico', US:'US', AR:'Argentina', CO:'Colombia', CL:'Chile', '419':'Latin America' };
+function vLabel(v){
+  const nm = v.name.replace(/^Microsoft /,'').replace(/ - Spanish.*$/,'').replace(/\s*\((enhanced|premium|mejorad[ao]|superior)\)/i,'').replace(/ Online \(Natural\)/,'');
+  const rg = REGION[(v.lang.split(/[-_]/)[1] || '').toUpperCase()] || v.lang;
+  const q = vQuality(v);
+  return nm + ' · ' + rg + (q === 3 ? ' · Premium' : q === 2 ? (/natural|neural|online/i.test(v.name) ? ' · Natural' : ' · Enhanced') : '') + (isMale(v) ? ' · male' : '');
+}
+function esVoices(){
+  if (!TTS) return [];
+  const best = {};
+  speechSynthesis.getVoices().filter(v => /^es/i.test(v.lang) && !NOVELTY.test(v.name)).forEach(v => {
+    const k = v.name.replace(/\s*\(.*\)/,'').replace(/ Online.*$/,'').toLowerCase() + '|' + v.lang.toLowerCase();
+    if (!best[k] || vQuality(v) > vQuality(best[k])) best[k] = v;
+  });
+  return Object.values(best).sort((a,b) => voiceScore(b) - voiceScore(a));
+}
 function voiceScore(v){
   let s = 0;
   if (isMale(v)) s += 10; else if (FEMALE.test(v.name)) s -= 2;
-  if (/natural|neural|online|premium|enhanced|mejorad|superior/i.test(v.name)) s += 6;
+  s += vQuality(v) * 4;
   if (/^es[-_]ES/i.test(v.lang)) s += 2; else if (/^es[-_](MX|US|419)/i.test(v.lang)) s += 1;
   return s;
 }
 function pickVoice(){
   if (!TTS) return; const vs = speechSynthesis.getVoices();
   const es = vs.filter(v => /^es/i.test(v.lang));
-  const chosen = S.settings.voice && es.find(v => v.name === S.settings.voice);
-  VOICE = chosen || es.slice().sort((a,b) => voiceScore(b) - voiceScore(a))[0] || null;
+  const want = S.settings.voice;
+  const chosen = want && (es.find(v => vid(v) === want) || es.filter(v => v.name === want).sort((a,b) => vQuality(b) - vQuality(a))[0]);
+  VOICE = chosen || esVoices()[0] || null;
 }
 function say(text, slow){
   if (!TTS) return;
@@ -657,7 +678,7 @@ function paintListen(finished){
 const PLAYBIG = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z" fill="currentColor"/></svg>';
 const PAUSE = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 5h4v14H7zM13 5h4v14h-4z" fill="currentColor"/></svg>';
 function voicesBySex(){
-  const es = TTS ? speechSynthesis.getVoices().filter(v => /^es/i.test(v.lang)).sort((a,b) => voiceScore(b) - voiceScore(a)) : [];
+  const es = esVoices();
   return { male: es.find(isMale) || null, female: es.find(v => !isMale(v)) || null };
 }
 function renderListen(home){
@@ -669,9 +690,9 @@ function renderListen(home){
   sel.addEventListener('change', () => { stopListen(); LS.unit = sel.value; LS.i = 0; renderHome(); });
   const mode = (m, l) => h('button', { class:'chip'+(LS.mode === m ? ' on' : ''), type:'button', 'aria-pressed': String(LS.mode === m), onclick:() => { LS.mode = m; renderHome(); } }, l);
   const { male, female } = voicesBySex();
-  const narr = (v, label, key) => v ? h('div', { class:'narr'+(VOICE && VOICE.name === v.name ? ' on' : '') },
-    h('button', { class:'narr-pick', type:'button', onclick:() => { S.settings.voice = v.name; save(); pickVoice(); renderHome(); } },
-      h('span', { class:'narr-a', 'aria-hidden':'true' }, key), h('span', {}, h('b', {}, label), h('small', {}, v.name.replace(/^Microsoft /,'').replace(/ - Spanish.*$/,'').replace(/\s*\(.*\)/,'')))),
+  const narr = (v, label, key) => v ? h('div', { class:'narr'+(VOICE && vid(VOICE) === vid(v) ? ' on' : '') },
+    h('button', { class:'narr-pick', type:'button', onclick:() => { S.settings.voice = vid(v); save(); pickVoice(); renderHome(); } },
+      h('span', { class:'narr-a', 'aria-hidden':'true' }, key), h('span', {}, h('b', {}, label), h('small', {}, vLabel(v).replace(/ · male$/,'')))),
     h('button', { class:'btn small soft', type:'button', onclick:() => { const keep = VOICE; VOICE = v; say('Hola, soy tu narrador.'); VOICE = keep; } }, '▶ Hear')) : null;
   const play = h('button', { class:'big-play', id:'ls-play', type:'button', 'aria-label':'Play', html:PLAYBIG });
   play.addEventListener('click', () => { if (!LS.list.length){ toast('Nothing to play here yet.'); return; }
@@ -731,7 +752,8 @@ function startSession(mode, ui, level){
   else if (mode === 'quick'){ let pool = ALL.filter(i => (i.kind === 'w' || i.kind === 's' || i.kind === 'v') && S.srs[i.key]);
     if (pool.length < 8) pool = ALL.filter(i => (i.kind === 'w' || i.kind === 's') && unlocked(i.u)); queue = buildFromItems(pool, 8); }
   if (!queue.length){ toast('Nothing to practise here yet.'); return; }
-  Q = { mode, ui, level, queue, i:0, total:0, right:0, missed:new Set(), t0:Date.now(), noSpeak:false };
+  Q = { mode, ui, level, queue, i:0, total:0, right:0, combo:0, missed:new Set(), t0:Date.now(), noSpeak:false,
+    before:{ streakDay:S.streak.last, today:todayXP(), level:userLevel() } };
   $('#quit').hidden = true;
   show('lesson'); nextEx();
 }
@@ -768,56 +790,162 @@ function resolve(res){
   if (!res.skip){
     if (!res.noRecord && (!ex.retry || !res.ok)) ex.items.forEach(it => rec(it.key, res.ok));
     if (!ex.retry){ Q.total++; if (res.ok) Q.right++; else Q.missed.add(ex.item.key); }
+    if (res.ok && !ex.retry) Q.combo++; else if (!res.ok) Q.combo = 0;
     if (!res.ok && Q.mode !== 'test' && ex.t !== 'match'){ const again = makeEx(ex.type, ex.item); if (again){ again.retry = true; Q.queue.push(again); } }
     save();
   }
   if (res.skip){ setBar('', res.msg || '', 'Continue', true); return; }
   sfx(res.ok);
   const extra = ex.reveal ? '<span class="mean">'+esc(ex.reveal)+'</span>' : '';
-  if (res.ok) setBar('good', '<b class="verdict">'+pick(PRAISE)+'</b>'+(res.note ? '<span>'+res.note+'</span>' : '')+extra, 'Continue', true);
+  const hot = res.ok && !ex.retry && Q.combo >= 5 && Q.combo % 5 === 0;
+  if (hot) fanfare(false);
+  if (res.ok) setBar('good' + (hot ? ' hot' : ''), '<b class="verdict">'+(hot ? '¡' + Q.combo + ' seguidas! <span class="combo">' + Q.combo + ' in a row</span>' : pick(PRAISE))+'</b>'+(res.note ? '<span>'+res.note+'</span>' : '')+extra, 'Continue', true);
   else {
     const ans = ex.t === 'match' ? '' : '<span>Correct answer: <b lang="'+(ex.to === 'en' || ex.type === 'mc_es2en' ? 'en' : 'es')+'">'+esc(ex.answers[0])+'</b></span>';
     setBar('bad', '<b class="verdict">'+(ex.t === 'match' ? 'Done, with a few slips' : 'Not quite')+'</b>'+(res.note ? '<span>'+res.note+'</span>' : '')+ans+extra, 'Continue', true);
   }
   $('#bar-btn').focus({ preventScroll:true });
 }
+/* ---------- finish: celebration screens ---------- */
+function fanfare(big){
+  if (!S.settings.sfx) return;
+  try { actx = actx || new (window.AudioContext || window.webkitAudioContext)();
+    const seq = big ? [523, 659, 784, 1047, 1319] : [523, 659, 784, 1047];
+    seq.forEach((f, i) => { const o = actx.createOscillator(), g = actx.createGain(); o.type = 'triangle';
+      o.frequency.value = f; const t = actx.currentTime + i * 0.11; g.gain.setValueAtTime(0.0001, t);
+      g.gain.exponentialRampToValueAtTime(0.13, t + 0.02); g.gain.exponentialRampToValueAtTime(0.0001, t + (i === seq.length-1 ? 0.7 : 0.25));
+      o.connect(g).connect(actx.destination); o.start(t); o.stop(t + 0.8); });
+  } catch(e){}
+}
+function confetti(big){
+  if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const cv = h('canvas', { class:'confetti', 'aria-hidden':'true' }); document.body.append(cv);
+  const ctx2 = cv.getContext('2d'), dpr = window.devicePixelRatio || 1;
+  const W = cv.width = innerWidth * dpr, H = cv.height = innerHeight * dpr;
+  const cs = getComputedStyle(document.documentElement);
+  const cols = ['--accent','--sun','--c-remember','--c-think','--c-expression','--good'].map(v => cs.getPropertyValue(v).trim() || '#E2A541');
+  const N = big ? 170 : 90, P = [];
+  for (let i = 0; i < N; i++){ const fromLeft = i % 2 === 0;
+    P.push({ x: fromLeft ? 0 : W, y: H * (0.55 + Math.random() * 0.2), vx: (fromLeft ? 1 : -1) * (4 + Math.random() * 9) * dpr, vy: -(10 + Math.random() * 12) * dpr,
+      w: (5 + Math.random() * 6) * dpr, hh: (8 + Math.random() * 8) * dpr, r: Math.random() * 6, vr: (Math.random() - .5) * .35, c: cols[i % cols.length] }); }
+  const t0 = performance.now();
+  (function frame(t){
+    const el = t - t0; ctx2.clearRect(0, 0, W, H);
+    P.forEach(p => { p.vy += 0.32 * dpr; p.vx *= 0.99; p.x += p.vx; p.y += p.vy; p.r += p.vr;
+      ctx2.save(); ctx2.translate(p.x, p.y); ctx2.rotate(p.r); ctx2.globalAlpha = Math.max(0, 1 - el / 3200);
+      ctx2.fillStyle = p.c; ctx2.fillRect(-p.w/2, -p.hh/2, p.w, p.hh * Math.abs(Math.cos(p.r * 2))); ctx2.restore(); });
+    if (el < 3300) requestAnimationFrame(frame); else cv.remove();
+  })(t0);
+}
+function countUp(el, to, fmt){
+  const t0 = performance.now(), d = 900;
+  (function f(t){ const k = Math.min(1, (t - t0) / d), e = 1 - Math.pow(1 - k, 3); el.textContent = fmt(Math.round(to * e)); if (k < 1) requestAnimationFrame(f); })(t0);
+}
+function accWord(acc){ return acc === 100 ? '¡Perfecto!' : acc >= 90 ? '¡Excelente!' : acc >= 75 ? 'Muy bien' : acc >= 50 ? 'Bien hecho' : 'Sigue así'; }
+const CHEERS = ['¡Lo has clavado!','¡Qué crack!','¡Vas volando!','¡Sigue así!','¡Increíble!','¡Olé!'];
+const TROPHY = '<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M20 8h24v14a12 12 0 0 1-24 0z" fill="currentColor"/><path d="M20 12H10v4a10 10 0 0 0 10 10M44 12h10v4a10 10 0 0 1-10 10" fill="none" stroke="currentColor" stroke-width="4"/><path d="M28 34h8v10h-8z" fill="currentColor"/><path d="M20 52h24v6H20zM24 44h16v8H24z" fill="currentColor"/></svg>';
+const STAR = '<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M32 4l8.5 17.6 19.3 2.6-14.1 13.4 3.5 19.2L32 47.5 14.8 56.8l3.5-19.2L4.2 24.2l19.3-2.6z" fill="currentColor"/></svg>';
+const BIGFLAME = '<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M32 4c3 11 15 16 15 31a15 15 0 0 1-30 0c0-7 3.5-12 7.5-15 0 6 3 9 6 9 0-9-3-17 1.5-25z" fill="currentColor"/><path d="M32 34c2 5 7 7 7 13a7 7 0 0 1-14 0c0-3 1.5-5 3.5-6 0 2.5 1.5 3.5 3 3.5-.5-4-1-7 .5-10.5z" fill="var(--bg)" opacity=".55"/></svg>';
+
 function finish(){
+  const B = Q.before || {};
   const acc = Q.total ? Math.round(Q.right / Q.total * 100) : 100;
-  const xp = Q.right + (Q.mode === 'lesson' ? 5 : 3);
-  let title = 'Session complete', note = '';
+  const perfect = Q.total >= 4 && Q.right === Q.total;
+  let xp = Q.right + (Q.mode === 'lesson' ? 5 : 3);
+  if (perfect) xp += 5;
+  let title = 'Session complete', note = '', unlocked2 = null, mastered = null, passed = true;
   if (Q.mode === 'lesson'){
     const u = COURSE[Q.ui]; const before = lvl(Q.ui); const p0 = bandPct(u.band); S.units[u.id] = Math.max(before, Q.level); const p1 = bandPct(u.band);
     if (p1 > p0) Q.bandUp = { band:u.band, p0, p1 };
-    title = u.es + ': ' + LEVEL_NAMES[Q.level] + ' complete';
-    if (before < 1 && Q.level === 1 && Q.ui + 1 < COURSE.length) note = 'Unit ' + (Q.ui + 2) + ', ' + COURSE[Q.ui+1].es + ', is now open.';
+    title = LEVEL_NAMES[Q.level] + ' complete';
+    if (before < 1 && Q.level === 1 && Q.ui + 1 < COURSE.length) unlocked2 = Q.ui + 1;
+    if (before < 3 && Q.level === 3) mastered = Q.ui;
   } else if (Q.mode === 'test'){
     const wrong = Q.total - Q.right;
     if (wrong <= 2){ for (let i=0;i<=Q.ui;i++) S.units[COURSE[i].id] = Math.max(lvl(i), 1); title = 'Test passed'; note = 'Units up to ' + COURSE[Q.ui].es + ' are now open.'; }
-    else { title = 'Not this time'; note = 'You missed ' + wrong + '. Passing needs 2 or fewer. The earlier units will get you there.'; }
-  } else if (Q.mode === 'review') title = 'Review complete';
-  else if (Q.mode === 'mistakes') title = 'Weak spots practised';
-  else if (Q.mode === 'verbs') title = 'Verb drill complete';
-  else if (Q.mode === 'kept') title = 'Kept cards practised';
-  else if (Q.mode === 'quick') title = 'Brain workout done';
-  if (Q.mode === 'lesson' || (Q.mode === 'test' && Q.total - Q.right <= 2)) markDaily('lesson');
+    else { passed = false; title = 'Not this time'; note = 'You missed ' + wrong + '. Passing needs 2 or fewer. The earlier units will get you there.'; }
+  } else title = { review:'Review complete', mistakes:'Weak spots practised', verbs:'Verb drill complete', kept:'Kept cards practised', quick:'Brain workout done' }[Q.mode] || title;
+  if (Q.mode === 'lesson' || (Q.mode === 'test' && passed)) markDaily('lesson');
   if (['review','mistakes','verbs','kept','quick'].includes(Q.mode)) markDaily('brain');
-  addXP(xp); bumpStreak(); save();
+  addXP(xp); bumpStreak();
+  if (perfect){ S.perfect = (S.perfect || 0) + 1; }
+  save();
   const secs = Math.round((Date.now() - Q.t0) / 1000);
   const missed = [...Q.missed].map(k => ITEMS[k]).filter(Boolean);
-  const done = $('#done'); done.innerHTML = '';
-  done.append(h('div', { class:'done-card' },
-    h('p', { class:'eyebrow' }, todayXP() >= S.settings.goal ? 'Daily goal reached' : 'Nice work'),
-    h('h2', {}, title), note ? h('p', { class:'done-note' }, note) : null,
-    Q.bandUp ? h('div', { class:'levels' }, bandRow(Q.bandUp.band, true), h('p', { class:'small' }, BANDS[Q.bandUp.band] + ' went from ' + Q.bandUp.p0 + '% to ' + Q.bandUp.p1 + '%.')) : null,
-    h('dl', { class:'done-stats' },
-      h('div', {}, h('dt', {}, 'XP earned'), h('dd', {}, '+'+xp)),
-      h('div', {}, h('dt', {}, 'Accuracy'), h('dd', {}, acc+'%')),
-      h('div', {}, h('dt', {}, 'Time'), h('dd', {}, Math.floor(secs/60)+':'+String(secs%60).padStart(2,'0')))),
-    missed.length ? h('div', { class:'missed' }, h('h3', {}, 'Worth another look'),
-      h('ul', {}, missed.map(it => h('li', {}, h('button', { class:'icon-btn tiny', type:'button', 'aria-label':'Play', html:ICON.play, onclick:() => say(it.es[0]) }),
-        h('span', { lang:'es', class:'m-es' }, it.es[0]), h('span', { class:'m-en' }, it.kind === 'v' ? it.en[0] : it.en[0]))))) : h('p', { class:'done-note' }, 'No mistakes. These will come back for review when they start to fade.'),
-    h('button', { class:'btn primary wide', type:'button', id:'done-btn', onclick:() => { Q = null; renderHome(); show('home'); } }, 'Continue')));
-  show('done'); setTimeout(() => $('#done-btn').focus(), 50);
+  const streakUp = B.streakDay !== dstr() && S.streak.last === dstr();
+  const goalHit = (B.today || 0) < S.settings.goal && todayXP() >= S.settings.goal;
+  const lvUp = userLevel() > (B.level || 1);
+  const unitName = Q.ui != null && COURSE[Q.ui] ? COURSE[Q.ui].es : '';
+
+  const screens = [];
+  /* 1. results */
+  screens.push(() => {
+    const xpEl = h('dd', {}, '+0'), accEl = h('dd', {}, '0%');
+    const node = h('div', { class:'done-card' + (perfect ? ' perfect' : '') },
+      perfect ? h('div', { class:'medal', html:STAR }) : h('div', { class:'medal small-medal', html:TROPHY }),
+      h('p', { class:'eyebrow' }, perfect ? 'Sin errores · flawless' : (passed ? pick(CHEERS) : 'Casi · almost')),
+      h('h2', {}, perfect ? '¡Perfecto!' : title),
+      h('p', { class:'done-note' }, perfect ? 'Every answer right first time' + (unitName && Q.mode === 'lesson' ? ' in ' + unitName + '. ' : '. ') + '+5 bonus XP.' + (S.perfect > 1 ? ' That\'s ' + S.perfect + ' perfect sessions so far.' : '')
+        : (unitName && Q.mode === 'lesson' ? unitName + ' · ' + title + '. ' : '') + note),
+      h('dl', { class:'done-stats' },
+        h('div', { class:'ds xp' }, h('dt', {}, 'Total XP'), xpEl, h('span', { class:'ds-w' }, perfect ? 'incl. +5 bonus' : 'earned')),
+        h('div', { class:'ds acc' }, h('dt', {}, 'Accuracy'), accEl, h('span', { class:'ds-w' }, accWord(acc))),
+        h('div', { class:'ds time' }, h('dt', {}, 'Time'), h('dd', {}, Math.floor(secs/60)+':'+String(secs%60).padStart(2,'0')), h('span', { class:'ds-w' }, secs < 120 ? '¡Rápido!' : 'Steady'))),
+      missed.length ? h('div', { class:'missed' }, h('h3', {}, 'Worth another look'),
+        h('ul', {}, missed.map(it => h('li', {}, h('button', { class:'icon-btn tiny', type:'button', 'aria-label':'Play', html:ICON.play, onclick:() => say(it.es[0]) }),
+          h('span', { lang:'es', class:'m-es' }, it.es[0]), h('span', { class:'m-en' }, it.en[0]))))) : null);
+    setTimeout(() => { countUp(xpEl, xp, n => '+' + n); countUp(accEl, acc, n => n + '%'); }, 250);
+    if (passed){ confetti(perfect); fanfare(perfect); if (perfect) setTimeout(() => say('¡Perfecto!'), 700); }
+    return node;
+  });
+  /* 2. streak */
+  if (streakUp) screens.push(() => {
+    const n = S.streak.n, today = new Date(), dow = (today.getDay() + 6) % 7;
+    const days = ['L','M','X','J','V','S','D'].map((d, i) => { const ago = dow - i;
+      const on = ago >= 0 && ago < n, isT = ago === 0;
+      return h('span', { class:'wk' + (on ? ' on' : '') + (isT ? ' today' : '') + (ago < 0 ? ' future' : '') }, h('b', {}, d)); });
+    fanfare(false);
+    return h('div', { class:'done-card center' }, h('div', { class:'medal flame-big', html:BIGFLAME }),
+      h('p', { class:'big-count' }, String(n)), h('h2', {}, n === 1 ? 'Day streak started' : 'day streak!'),
+      h('div', { class:'week' }, days),
+      h('p', { class:'done-note' }, n === 1 ? 'Come back tomorrow to make it two. Even five minutes counts.' : 'You\'ve practised ' + n + ' days in a row. Keep the flame alive tomorrow.'));
+  });
+  /* 3. daily goal */
+  if (goalHit) screens.push(() => h('div', { class:'done-card center' }, h('div', { class:'medal', html:TROPHY }),
+    h('p', { class:'eyebrow' }, 'Meta diaria · daily goal'), h('h2', {}, 'Daily goal reached'),
+    h('p', { class:'done-note' }, todayXP() + ' XP today, goal ' + S.settings.goal + '. Anything more today is a bonus.')));
+  /* 4. unit progress / unlock / mastered */
+  if (Q.bandUp || unlocked2 != null || mastered != null) screens.push(() => {
+    if (mastered != null) setTimeout(() => confetti(true), 150);
+    return h('div', { class:'done-card' },
+      mastered != null ? h('div', { class:'medal', html:TROPHY }) : null,
+      h('p', { class:'eyebrow' }, 'Tu ruta · your route'),
+      h('h2', {}, mastered != null ? COURSE[mastered].es + ' mastered' : unlocked2 != null ? 'New stop unlocked' : 'You moved forward'),
+      unlocked2 != null ? h('p', { class:'done-note' }, 'Unit ' + (unlocked2 + 1) + ', ', h('b', { lang:'es' }, COURSE[unlocked2].es), ' (' + COURSE[unlocked2].en + '), is now open.') : null,
+      mastered != null ? h('p', { class:'done-note' }, 'All three levels done. Its words will keep coming back in reviews so they stay fresh.') : null,
+      routeMap(),
+      Q.bandUp ? h('div', { class:'levels' }, bandRow(Q.bandUp.band, true), h('p', { class:'small' }, BANDS[Q.bandUp.band] + ' went from ' + Q.bandUp.p0 + '% to ' + Q.bandUp.p1 + '%.')) : null);
+  });
+  /* 5. level up */
+  if (lvUp) screens.push(() => { confetti(false); fanfare(true);
+    return h('div', { class:'done-card center' }, h('div', { class:'medal lv-medal' }, h('span', {}, 'Lv'), h('b', {}, String(userLevel()))),
+      h('p', { class:'eyebrow' }, 'Nuevo nivel · level up'), h('h2', {}, 'You reached level ' + userLevel()),
+      h('p', { class:'done-note' }, levelSpan().need + ' XP to level ' + (userLevel() + 1) + '.')); });
+
+  let si = 0;
+  const done = $('#done');
+  const paint = () => {
+    done.innerHTML = '';
+    const last = si === screens.length - 1;
+    const node = screens[si]();
+    node.classList.add('pop');
+    done.append(node,
+      screens.length > 1 ? h('div', { class:'dots', 'aria-hidden':'true' }, screens.map((_, i) => h('span', { class: i === si ? 'on' : '' }))) : null,
+      h('button', { class:'btn primary wide', type:'button', id:'done-btn', onclick:() => {
+        if (!last){ si++; paint(); window.scrollTo(0,0); } else { Q = null; renderHome(); show('home'); } } }, last ? 'Continue' : 'Next'));
+    setTimeout(() => { const b = $('#done-btn'); if (b) b.focus(); }, 50);
+  };
+  show('done'); paint();
 }
 
 /* ---------- exercise renderers ---------- */
@@ -1045,14 +1173,13 @@ function settingsNodes(){
     h('button', { class:'btn small danger', type:'button', onclick:() => { S = fresh(); save(); closeSheet(); SC.feed = []; renderHome(); toast('Progress reset.'); } }, 'Yes, reset'),
     h('button', { class:'btn small text', type:'button', onclick:() => confirmRow.hidden = true }, 'Cancel'));
   return [
-    (() => { const all = TTS ? speechSynthesis.getVoices().filter(v => /^es/i.test(v.lang)).sort((a,b) => voiceScore(b) - voiceScore(a)) : [];
-      const sel = h('select', { id:'set-voice' }, all.map(v => h('option', { value:v.name, selected: VOICE && v.name === VOICE.name },
-        v.name.replace(/^Microsoft /,'').replace(/ - Spanish.*$/,'') + ' · ' + v.lang + (isMale(v) ? ' · male' : '') + (/natural|neural|online|premium|enhanced|mejorad|superior/i.test(v.name) ? ' · clearest' : ''))));
+    (() => { const all = esVoices();
+      const sel = h('select', { id:'set-voice' }, all.map(v => h('option', { value:vid(v), selected: VOICE && vid(v) === vid(VOICE) }, vLabel(v))));
       sel.addEventListener('change', () => { S.settings.voice = sel.value; save(); pickVoice(); say('Hola, ¿qué tal? Vamos a aprender español.'); });
       const anyMale = all.some(isMale);
       return h('div', { class:'field' }, h('label', { for:'set-voice' }, 'Voice'),
         all.length ? sel : h('p', { class:'small' }, 'No Spanish voice found on this device, so listening exercises are skipped.'),
-        h('p', { class:'small' }, anyMale ? 'Male voices are picked first. Voices marked "clearest" sound the most natural.'
+        h('p', { class:'small' }, anyMale ? 'Enhanced, Premium and Natural voices are the clearest. On iPhone, download them in Settings › Accessibility › Spoken Content › Voices › Spanish, then reopen Ruta.'
           : 'This browser has no male Spanish voice. Open Ruta in Microsoft Edge for the clear male voice Álvaro.')); })(),
     h('div', { class:'field' }, h('label', { for:'set-rate' }, 'Voice speed'), h('div', { class:'range' }, rate, rateOut),
       h('button', { class:'btn small soft', type:'button', onclick:() => say('Hola, ¿qué tal? Vamos a aprender español.') }, 'Test voice')),
@@ -1079,6 +1206,7 @@ function settingsNodes(){
 /* ---------- boot ---------- */
 function boot(){
   load(); pickVoice();
+  [300, 1000, 2500, 5000].forEach(t => setTimeout(() => { const before = VOICE && vid(VOICE); pickVoice(); pickEnVoice(); if ((VOICE && vid(VOICE)) !== before && !$('#home').hidden && (TAB === 'listen' || TAB === 'me')) renderHome(); }, t));
   if (TTS && 'onvoiceschanged' in speechSynthesis) speechSynthesis.onvoiceschanged = () => { pickVoice(); pickEnVoice(); if (TAB === 'listen' && !$('#home').hidden) renderHome(); };
   wireTips();
   $('#bar-btn').addEventListener('click', onBar);

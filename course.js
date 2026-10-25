@@ -304,3 +304,121 @@ const GLOSS = {
   viajar:'to travel', viejo:'old', viernes:'Friday', vimos:'we saw', viven:'they live', vives:'you live', vivo:'I live',
   'viví':'I lived', voy:'I go', y:'and', yo:'I', 'él':'he'
 };
+
+/* Scroll feed extras. Culture: [title, text]. False friends: [spanish, looks like, really means, example]. */
+const CULTURE = [
+  ['Two kisses hello', 'In Spain, friends and new acquaintances often greet with <i>dos besos</i>, a light cheek-to-cheek on each side, starting with your right cheek to their right cheek. Men greeting other men usually shake hands instead.'],
+  ['Dinner at ten', 'Spaniards eat late. Lunch, the big meal, is often around 2 pm and dinner can be 9 or 10 pm. A restaurant may be empty at 7 pm and full at 10.'],
+  ['Sobremesa', '<i>La sobremesa</i> is the time spent chatting around the table after a meal is finished. There is no single English word for it, which says something about the culture.'],
+  ['Where "tapa" comes from', '<i>Tapa</i> means "lid" or "cover". A popular story says bars once covered drinks with a slice of bread or ham to keep flies out, and the snack took the name.'],
+  ['¡Ojalá!', '<i>Ojalá</i> means "I hope so" or "if only". It comes from Arabic, roughly "if God wills", a trace of the centuries of Moorish rule in Spain. Thousands of Spanish words have Arabic roots.'],
+  ['Words from Arabic', 'Many Spanish words starting with <i>al-</i> come from Arabic: <i>almohada</i> (pillow), <i>azúcar</i> (sugar), <i>aceite</i> (oil), <i>alcalde</i> (mayor).'],
+  ['Vale', 'In Spain you will hear <i>vale</i> constantly. It means "OK" or "sounds good": <i>¿Quedamos a las ocho? — Vale.</i>'],
+  ['¿Mande?', 'In Mexico, if you didn\'t hear someone, a polite reply is <i>¿Mande?</i>, meaning "pardon?". In Spain people usually say <i>¿Cómo?</i> or <i>¿Perdón?</i>'],
+  ['Ahorita', 'In Mexico <i>ahorita</i> literally means "right now", but it can mean anything from "this second" to "sometime later". Context and tone tell you which.'],
+  ['Upside-down marks', 'The opening <b>¿</b> and <b>¡</b> warn you a question or exclamation is coming, which matters because Spanish word order often doesn\'t change for questions: <i>¿Tienes hambre?</i> vs <i>Tienes hambre.</i>'],
+  ['Days named after planets', 'Most weekdays come from the planets and Roman gods: <i>lunes</i> (Moon), <i>martes</i> (Mars), <i>miércoles</i> (Mercury), <i>jueves</i> (Jupiter), <i>viernes</i> (Venus).'],
+  ['Castellano or español?', 'Both names are correct. <i>Castellano</i> (Castilian) is common in Spain and parts of South America, where it separates it from other languages of Spain like Catalan, Galician and Basque.'],
+  ['Vosotros on the map', '<i>Vosotros</i> (you all, informal) is used almost only in Spain. In Latin America, <i>ustedes</i> covers every group of "you", formal or not.'],
+  ['The biggest Spanish-speaking country', 'Mexico has more Spanish speakers than any other country, far more than Spain. The United States also has tens of millions of Spanish speakers.'],
+  ['La Tomatina', 'On the last Wednesday of August, the town of Buñol near Valencia holds <i>La Tomatina</i>, a huge street fight where thousands of people throw ripe tomatoes at each other.'],
+  ['Día de Muertos', 'In Mexico, <i>Día de Muertos</i> (1–2 November) honours loved ones who have died, with altars called <i>ofrendas</i>, marigold flowers, photos and their favourite foods.'],
+  ['The Camino de Santiago', 'Pilgrims have walked the <i>Camino de Santiago</i> for centuries to Santiago de Compostela in Galicia. Today many walk it for the scenery, the people and the challenge.'],
+  ['Guiri', 'Spaniards jokingly call foreign tourists <i>guiris</i>. It\'s usually friendly teasing, especially for anyone sunburnt in sandals and socks.'],
+  ['Tú or usted?', 'Use <i>usted</i> with older people, officials and in formal service. In Spain, people switch to <i>tú</i> quickly, so if someone uses <i>tú</i> with you, it\'s fine to do the same.'],
+  ['Buenas', 'A casual all-purpose greeting is just <i>¡Buenas!</i>, short for <i>buenas tardes</i> or <i>buenos días</i>. You\'ll hear it walking into shops and bars.'],
+  ['The Real Academia', 'The <i>Real Academia Española</i>, founded in 1713, publishes the official dictionary and spelling rules. Its motto is <i>Limpia, fija y da esplendor</i>: "it cleans, fixes and gives splendour".'],
+  ['Spanish sounds out loud', 'Spanish is very phonetic: once you know the rules, you can pronounce almost any word you read. Unlike English, the vowels always keep the same sound.']
+];
+const FALSE_FRIENDS = [
+  ['embarazada', 'embarrassed', 'pregnant', 'Mi hermana está embarazada.'],
+  ['constipado', 'constipated', 'having a cold', 'Estoy constipado, no puedo salir.'],
+  ['éxito', 'exit', 'success', 'La película fue un gran éxito.'],
+  ['librería', 'library', 'bookshop', 'Compré un libro en la librería.'],
+  ['carpeta', 'carpet', 'folder', 'Los papeles están en la carpeta.'],
+  ['sensible', 'sensible', 'sensitive', 'Es una persona muy sensible.'],
+  ['actual', 'actual', 'current', 'El presidente actual es joven.'],
+  ['realizar', 'to realise', 'to carry out', 'Vamos a realizar un proyecto.'],
+  ['asistir', 'to assist', 'to attend', 'Voy a asistir a la reunión.'],
+  ['molestar', 'to molest', 'to bother', 'No quiero molestar.'],
+  ['ropa', 'rope', 'clothes', 'Tengo mucha ropa.'],
+  ['once', 'once', 'eleven', 'Son las once.']
+];
+
+/* Daily five. Word of the day: [spanish, english, example, example in English]. */
+const WORD_DAY = [
+  ['la sobremesa','time chatting at the table after a meal','Nos quedamos de sobremesa dos horas.','We stayed chatting at the table for two hours.'],
+  ['madrugar','to get up early','Mañana tengo que madrugar.','Tomorrow I have to get up early.'],
+  ['el mercado','market','Compro fruta en el mercado.','I buy fruit at the market.'],
+  ['la merienda','afternoon snack','La merienda es a las seis.','The afternoon snack is at six.'],
+  ['disfrutar','to enjoy','¡Disfruta tu viaje!','Enjoy your trip!'],
+  ['quizás','maybe, perhaps','Quizás vamos mañana.','Maybe we\'ll go tomorrow.'],
+  ['el sobrino','nephew','Mi sobrino tiene cinco años.','My nephew is five years old.'],
+  ['aprovechar','to make the most of','Hay que aprovechar el sol.','You have to make the most of the sun.'],
+  ['la madrugada','the early hours (after midnight)','Llegamos a las tres de la madrugada.','We arrived at three in the morning.'],
+  ['el atasco','traffic jam','Hay un atasco en la autopista.','There\'s a traffic jam on the motorway.'],
+  ['ahorrar','to save (money)','Quiero ahorrar para un coche.','I want to save for a car.'],
+  ['el cumpleaños','birthday','¡Feliz cumpleaños!','Happy birthday!'],
+  ['la sombra','shade, shadow','Vamos a la sombra.','Let\'s go into the shade.'],
+  ['charlar','to chat','Me gusta charlar con mis amigos.','I like chatting with my friends.'],
+  ['el fin de semana','weekend','¿Qué haces el fin de semana?','What are you doing at the weekend?'],
+  ['despacio','slowly','Habla más despacio, por favor.','Speak more slowly, please.'],
+  ['tener sueño','to be sleepy','Tengo mucho sueño.','I\'m really sleepy.'],
+  ['probar','to try, to taste','¿Quieres probar la paella?','Do you want to try the paella?'],
+  ['olvidar','to forget','No olvides las llaves.','Don\'t forget the keys.'],
+  ['la plaza','town square','Quedamos en la plaza.','Let\'s meet in the square.'],
+  ['quedar','to meet up','¿Quedamos a las ocho?','Shall we meet at eight?'],
+  ['el vecino','neighbour','Mi vecino es muy amable.','My neighbour is very kind.'],
+  ['amable','kind','Gracias, eres muy amable.','Thanks, you\'re very kind.'],
+  ['por fin','at last','¡Por fin es viernes!','At last it\'s Friday!'],
+  ['la ola','wave (at sea)','Las olas son grandes hoy.','The waves are big today.'],
+  ['el gasto','expense','Tengo muchos gastos este mes.','I have a lot of expenses this month.'],
+  ['acordarse','to remember','No me acuerdo de su nombre.','I don\'t remember his name.'],
+  ['tranquilo','calm, relaxed','Tranquilo, no pasa nada.','Relax, it\'s no big deal.'],
+  ['el viaje','trip, journey','¡Buen viaje!','Have a good trip!'],
+  ['el consejo','piece of advice','Te doy un consejo.','Let me give you some advice.']
+];
+/* Real life: [situation, spanish, english, tip]. */
+const PRACTICAL = [
+  ['Emergency','¡Ayuda! Llame a una ambulancia.','Help! Call an ambulance.','In Spain and across the EU, the emergency number is 112.'],
+  ['When you\'re lost','Perdone, me he perdido. ¿Me puede ayudar?','Excuse me, I\'m lost. Can you help me?','"Perdone" is the polite way to stop a stranger.'],
+  ['When you don\'t understand','No entiendo. ¿Puede repetir, por favor?','I don\'t understand. Can you repeat that, please?','Add "más despacio" (more slowly) if they speak fast.'],
+  ['Asking for English','¿Habla inglés?','Do you speak English?','Try a few words of Spanish first. People appreciate the effort.'],
+  ['At the pharmacy','¿Tiene algo para el dolor de cabeza?','Do you have something for a headache?','Spanish pharmacies have a green cross sign and the staff give good advice.'],
+  ['Allergies','Soy alérgico a los frutos secos.','I\'m allergic to nuts.','Say "alérgica" if you\'re a woman.'],
+  ['Paying by card','¿Puedo pagar con tarjeta?','Can I pay by card?','Card is accepted almost everywhere, but small bars may prefer cash.'],
+  ['Getting the bill','¿Me cobra, por favor?','Can I pay, please?','In Spain the waiter won\'t bring the bill until you ask for it.'],
+  ['At the station','Un billete de ida y vuelta a Madrid, por favor.','A return ticket to Madrid, please.','"Solo ida" means one way.'],
+  ['Opening hours','¿A qué hora abre la tienda?','What time does the shop open?','Many small shops in Spain close for a few hours in the afternoon.'],
+  ['Seeing a doctor','Necesito un médico. Me duele aquí.','I need a doctor. It hurts here.','Point to where it hurts while you say "aquí".'],
+  ['Writing it down','¿Me lo puede escribir, por favor?','Can you write it down for me, please?','Handy for addresses, prices and names.'],
+  ['At the hotel','La ducha no funciona.','The shower doesn\'t work.','Swap in anything: "El aire acondicionado no funciona".'],
+  ['Booking a table','Quería reservar una mesa para cuatro a las nueve.','I\'d like to book a table for four at nine.','"Quería" (I wanted) is a soft, polite way to ask.'],
+  ['Asking the way','¿Cómo llego a la estación?','How do I get to the station?','"¿Cómo llego a…?" works for anywhere.'],
+  ['Taxi','Lléveme a esta dirección, por favor.','Take me to this address, please.','Show the address on your phone as you say it.'],
+  ['Shopping','¿Tiene esto en otra talla?','Do you have this in another size?','"Más grande" is bigger, "más pequeña" is smaller.'],
+  ['Wi-Fi','¿Cuál es la contraseña del wifi?','What\'s the Wi-Fi password?','Spaniards say "wifi" like "wee-fee".'],
+  ['Saying sorry','Lo siento, ha sido sin querer.','Sorry, I didn\'t mean to.','"Perdón" is for small bumps; "lo siento" is a real apology.'],
+  ['Making friends','¿Te apetece tomar algo?','Do you fancy getting a drink?','"Tomar algo" is the classic casual invitation.']
+];
+/* Sayings and quotes: [spanish, literal English, meaning, source or null]. */
+const DICHOS = [
+  ['Poco a poco se va lejos.','Little by little, you go far.','Slow, steady progress gets you there.', null],
+  ['Caminante, no hay camino, se hace camino al andar.','Traveller, there is no road; the road is made by walking.','You make your own path by moving forward.','Antonio Machado'],
+  ['El que lee mucho y anda mucho, ve mucho y sabe mucho.','The one who reads much and walks much, sees much and knows much.','Reading and travel make you wise.','Miguel de Cervantes, Don Quijote'],
+  ['Más vale tarde que nunca.','Better late than never.','The same as the English saying.', null],
+  ['En boca cerrada no entran moscas.','Flies don\'t get into a closed mouth.','Sometimes it\'s wiser to stay quiet.', null],
+  ['No hay mal que por bien no venga.','There\'s no bad that doesn\'t come with some good.','Every cloud has a silver lining.', null],
+  ['Dime con quién andas y te diré quién eres.','Tell me who you walk with and I\'ll tell you who you are.','You\'re judged by the company you keep.', null],
+  ['A quien madruga, Dios le ayuda.','God helps whoever gets up early.','The early bird catches the worm.', null],
+  ['Más vale pájaro en mano que ciento volando.','A bird in the hand is worth more than a hundred flying.','Value what you already have.', null],
+  ['Camarón que se duerme, se lo lleva la corriente.','The shrimp that falls asleep gets swept away by the current.','Stay alert or you\'ll miss out.', null],
+  ['Ojos que no ven, corazón que no siente.','Eyes that don\'t see, heart that doesn\'t feel.','What you don\'t know can\'t hurt you.', null],
+  ['El que no arriesga, no gana.','Whoever doesn\'t risk doesn\'t win.','Nothing ventured, nothing gained.', null],
+  ['Ser pan comido.','To be eaten bread.','To be a piece of cake: very easy.', null],
+  ['Estar en las nubes.','To be in the clouds.','To be daydreaming.', null],
+  ['Tomar el pelo.','To take someone\'s hair.','To pull someone\'s leg.', null],
+  ['Costar un ojo de la cara.','To cost an eye from your face.','To cost an arm and a leg.', null],
+  ['Echar una mano.','To throw a hand.','To lend a hand.', null],
+  ['Al mal tiempo, buena cara.','To bad weather, a good face.','Keep smiling when things go wrong.', null]
+];

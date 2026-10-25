@@ -5,134 +5,269 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Ruta Spanish</title>
 <meta name="claude:viewport-fit-sides" content="cover">
+<meta name="theme-color" content="#14110E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Young+Serif&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..600&family=Manrope:wght@400;500;600;700;800&display=swap">
 <style>
-/* Layout: one centred column (max 640px). Home = streak/goal strip, practice row, then the unit path grouped by CEFR band.
-   Lesson = progress bar, one exercise at a time, and a fixed check bar along the bottom edge. */
+/* Layout: one 620px column. Home is a tabbed app (Learn · Practise · Scroll · Listen · Me) with a fixed bottom bar.
+   Look: "noche andaluza", a warm dark evening ground, cream ink, saffron accent; each content kind has its own soft colour. */
 :root{
-  --bg:#EEF1F7; --surface:#FFFFFF; --sunk:#E2E7F1; --ink:#14203B; --muted:#56627F; --line:#D2D9E7;
-  --accent:#1D4DBF; --accent-2:#163C96; --on-accent:#FFFFFF; --accent-soft:#DCE5FA;
-  --sun:#D99A00; --good:#13784A; --good-bg:#DCF2E6; --bad:#B4380C; --bad-bg:#FBE3D8;
-  --display:"Young Serif", Georgia, "Times New Roman", serif;
-  --body:"Atkinson Hyperlegible", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  --r:12px;
+  --bg:#14110E; --surface:#1E1914; --sunk:#2A231C; --ink:#F5EEE3; --muted:#ABA093; --line:#3A3128;
+  --accent:#E2A541; --accent-2:#9C6A1C; --on-accent:#1C1307; --accent-soft:#3A2A14;
+  --sun:#F0C05A; --good:#93BF7E; --good-bg:#1F2A1A; --bad:#E4846F; --bad-bg:#3A1E18;
+  --c-learn:#E2A541; --c-remember:#86BFA6; --c-test:#E4846F; --c-practical:#C9C27A; --c-think:#8EAEE0; --c-expression:#D79BB8;
+  --display:"Bodoni Moda", "Didot", Georgia, serif;
+  --body:"Manrope", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --r:16px; color-scheme:dark;
 }
-@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
-  --bg:#0D1322; --surface:#151D31; --sunk:#1C2640; --ink:#E6EBF6; --muted:#9AA6C3; --line:#28334F;
-  --accent:#7097FF; --accent-2:#94B1FF; --on-accent:#0B1120; --accent-soft:#1F2C52;
-  --sun:#F2C14E; --good:#45C487; --good-bg:#12321F; --bad:#F2875A; --bad-bg:#3A1C10; color-scheme:dark; } }
-:root[data-theme="dark"]{
-  --bg:#0D1322; --surface:#151D31; --sunk:#1C2640; --ink:#E6EBF6; --muted:#9AA6C3; --line:#28334F;
-  --accent:#7097FF; --accent-2:#94B1FF; --on-accent:#0B1120; --accent-soft:#1F2C52;
-  --sun:#F2C14E; --good:#45C487; --good-bg:#12321F; --bad:#F2875A; --bad-bg:#3A1C10; color-scheme:dark; }
+@media (prefers-color-scheme: light){ :root:not([data-theme="dark"]){
+  --bg:#F6F0E6; --surface:#FFFCF6; --sunk:#EEE4D4; --ink:#2A2119; --muted:#74675A; --line:#E2D6C4;
+  --accent:#B4741A; --accent-2:#80520F; --on-accent:#FFF8EC; --accent-soft:#F5E2C0;
+  --sun:#B8820F; --good:#3F7A35; --good-bg:#E3EED8; --bad:#B4432C; --bad-bg:#F7E0D8;
+  --c-learn:#B4741A; --c-remember:#3E8467; --c-test:#B4432C; --c-practical:#7C7524; --c-think:#3F64A6; --c-expression:#A2486F; color-scheme:light; } }
+:root[data-theme="light"]{
+  --bg:#F6F0E6; --surface:#FFFCF6; --sunk:#EEE4D4; --ink:#2A2119; --muted:#74675A; --line:#E2D6C4;
+  --accent:#B4741A; --accent-2:#80520F; --on-accent:#FFF8EC; --accent-soft:#F5E2C0;
+  --sun:#B8820F; --good:#3F7A35; --good-bg:#E3EED8; --bad:#B4432C; --bad-bg:#F7E0D8;
+  --c-learn:#B4741A; --c-remember:#3E8467; --c-test:#B4432C; --c-practical:#7C7524; --c-think:#3F64A6; --c-expression:#A2486F; color-scheme:light; }
 
 *{box-sizing:border-box}
 [hidden]{display:none!important}
-body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.5;
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16.5px;line-height:1.55;
   padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px));-webkit-tap-highlight-color:transparent}
 body.locked{overflow:hidden}
 button,input,select,textarea{font:inherit;color:inherit}
 button{cursor:pointer}
 button:disabled{cursor:default}
-:focus-visible{outline:3px solid var(--accent);outline-offset:2px;border-radius:8px}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:10px}
 h1,h2,h3{text-wrap:balance;margin:0}
-main{max-width:640px;margin:0 auto;padding-block:20px 140px}
+i{font-style:italic}
+main{max-width:620px;margin:0 auto;padding-block:16px 120px}
+body.in-lesson main{padding-bottom:150px}
 
 /* buttons */
-.btn{border:0;border-radius:999px;padding:12px 20px;font-weight:700;line-height:1.2;transition:transform .08s, background .15s}
+.btn{border:0;border-radius:999px;padding:13px 22px;font-weight:700;line-height:1.2;transition:transform .08s, background .15s, filter .15s}
 .btn:active:not(:disabled){transform:translateY(1px)}
 .btn.primary{background:var(--accent);color:var(--on-accent);box-shadow:0 3px 0 var(--accent-2)}
+.btn.primary:hover:not(:disabled){filter:brightness(1.06)}
 .btn.primary:disabled{background:var(--sunk);color:var(--muted);box-shadow:none}
 .btn.soft{background:var(--accent-soft);color:var(--accent)}
-.btn.ghost{background:transparent;border:2px solid var(--line);color:var(--ink)}
+.btn.ghost{background:transparent;border:1.5px solid var(--line);color:var(--ink)}
 .btn.ghost:disabled{color:var(--muted);border-style:dashed}
 .btn.text{background:none;color:var(--accent);padding:8px 10px}
-.btn.small{padding:8px 16px;font-size:15px}
+.btn.small{padding:9px 16px;font-size:14.5px}
 .btn.wide{width:100%}
-.btn.danger{background:var(--bad);color:var(--surface)}
-.btn.danger-ghost{background:none;border:2px solid var(--bad);color:var(--bad)}
+.btn.danger{background:var(--bad);color:var(--bg)}
+.btn.danger-ghost{background:none;border:1.5px solid var(--bad);color:var(--bad)}
 .icon-btn{display:inline-grid;place-items:center;width:40px;height:40px;border-radius:50%;border:0;background:var(--accent-soft);color:var(--accent);flex:none}
-.icon-btn svg{width:22px;height:22px}
-.icon-btn.big{width:52px;height:52px;background:var(--accent);color:var(--on-accent)}
-.icon-btn.big svg{width:28px;height:28px}
+.icon-btn svg{width:21px;height:21px}
+.icon-btn.big{width:50px;height:50px;background:var(--accent);color:var(--on-accent)}
+.icon-btn.big svg{width:26px;height:26px}
 .icon-btn.tiny{width:32px;height:32px}
-.icon-btn.tiny svg{width:18px;height:18px}
+.icon-btn.tiny svg{width:17px;height:17px}
 
-/* home */
-.top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:20px}
-.brand{display:flex;align-items:center;gap:12px}
-.mark{width:44px;height:44px;border-radius:10px;flex:none;
-  background:
-    radial-gradient(circle at 50% 50%, var(--sun) 0 18%, transparent 19%),
-    conic-gradient(from 45deg, var(--accent) 0 25%, var(--surface) 0 50%, var(--accent) 0 75%, var(--surface) 0) 0 0/22px 22px;
-  border:2px solid var(--accent)}
-.brand h1{font-family:var(--display);font-weight:400;font-size:30px;line-height:1}
-.sub{margin:2px 0 0;color:var(--muted);font-size:15px}
-.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:14px}
-.stat{background:var(--surface);border-radius:var(--r);padding:12px 14px;display:flex;flex-direction:column;gap:2px;min-width:0}
-.stat-k{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:700}
-.stat-v{font-size:24px;font-weight:700;font-variant-numeric:tabular-nums;line-height:1.2;white-space:nowrap}
-.stat-v small{font-size:14px;color:var(--muted);font-weight:400}
-.streak{display:flex;align-items:center;gap:4px}
-.flame{display:inline-flex;color:var(--sun)} .flame svg{width:22px;height:22px}
-.meter{display:block;height:6px;border-radius:3px;background:var(--sunk);margin-top:6px;overflow:hidden}
-.meter span{display:block;height:100%;background:var(--sun);border-radius:3px}
-.levels{background:var(--surface);border-radius:var(--r);padding:14px 16px;display:grid;gap:10px;margin-bottom:14px}
+/* shared */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:18px}
+.eyebrow{margin:0;font-size:12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--accent)}
+.eyebrow i{font-family:var(--display);letter-spacing:.02em;text-transform:none;font-weight:400;font-size:14px;color:var(--muted)}
+.kicker{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--cc, var(--accent))}
+.kicker::before{content:"";width:8px;height:8px;border-radius:50%;background:currentColor}
+.kicker i{font-family:var(--display);letter-spacing:.02em;text-transform:none;font-weight:400;font-size:14px;color:var(--muted)}
+.small{font-size:14px;color:var(--muted);margin:0}
+.meter{display:block;height:6px;border-radius:3px;background:var(--sunk);overflow:hidden}
+.meter span{display:block;height:100%;width:0;background:var(--sun);border-radius:3px;transition:width .4s ease}
+.c-learn{--cc:var(--c-learn)} .c-remember{--cc:var(--c-remember)} .c-test{--cc:var(--c-test)}
+.c-practical{--cc:var(--c-practical)} .c-think{--cc:var(--c-think)} .c-expression{--cc:var(--c-expression)}
+.chip{background:transparent;border:1.5px solid var(--line);border-radius:999px;padding:8px 15px;font-size:13px;font-weight:700;letter-spacing:.06em;white-space:nowrap}
+.chip.on,.chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+
+/* top bar */
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-block:6px 18px}
+.brand{display:flex;align-items:center;gap:10px;min-width:0}
+.mark{width:30px;height:30px;flex:none;color:var(--accent)}
+.mark svg{width:100%;height:100%;display:block}
+.brand-name{font-family:var(--display);font-size:26px;font-weight:500;letter-spacing:.01em;line-height:1}
+.tag{font-size:11px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;background:var(--accent);color:var(--on-accent);border-radius:6px;padding:3px 7px}
+.pills{display:flex;gap:6px}
+.pill{display:inline-flex;align-items:center;gap:5px;border:1.5px solid var(--line);border-radius:999px;padding:6px 12px;font-size:13.5px;font-weight:700;font-variant-numeric:tabular-nums;color:var(--muted);white-space:nowrap}
+.pill b{color:var(--ink)}
+.pill.streak{color:var(--sun);background:var(--accent-soft);border-color:transparent}
+.pill.lv{color:var(--ink)}
+.flame{display:inline-flex} .flame svg{width:15px;height:15px}
+
+/* hero + route */
+.hero{display:grid;gap:12px;text-align:center;justify-items:center;margin-bottom:16px}
+.hero-t{font-family:var(--display);font-weight:500;font-size:clamp(30px,8.4vw,42px);line-height:1.1;letter-spacing:-.005em}
+.hero-t span{font-style:italic;color:var(--accent)}
+.route-wrap{width:100%}
+.route{width:100%;height:auto;display:block;overflow:visible}
+.road{fill:none;stroke:var(--sunk);stroke-width:14;stroke-linecap:round}
+.road-mid{fill:none;stroke:var(--line);stroke-width:1.5;stroke-dasharray:5 7}
+.road-done{fill:none;stroke:var(--accent);stroke-width:6;stroke-linecap:round;transition:stroke-dashoffset 1.2s cubic-bezier(.3,.7,.2,1)}
+.stop{fill:var(--surface);stroke:var(--line);stroke-width:2}
+.stop.full{fill:var(--accent);stroke:var(--accent)}
+.stop-c{font:800 7px var(--body);fill:var(--muted);letter-spacing:.04em}
+.stop.full + .stop-c{fill:var(--on-accent)}
+.stop-l{font:700 10.5px var(--body);fill:var(--muted)}
+.stop-start{fill:var(--muted)}
+.me{fill:var(--sun);stroke:var(--bg);stroke-width:2}
+.me-glow{fill:var(--sun);opacity:.22;animation:glow 2.2s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+@keyframes glow{50%{transform:scale(1.5);opacity:.08}}
+.goal{width:100%;display:grid;grid-template-columns:auto minmax(0,1fr);align-items:center;gap:12px;font-size:14px;color:var(--muted)}
+.goal b{color:var(--ink);font-variant-numeric:tabular-nums}
+.page-head{display:grid;gap:8px;margin-bottom:18px}
+
+/* daily five */
+.daily{display:grid;gap:14px;margin-bottom:14px}
+.daily h2 i{font-size:16px;color:var(--muted)}
+.five{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}
+.d-btn{display:grid;justify-items:center;gap:4px;background:none;border:0;padding:4px 0;min-width:0}
+.d-ring{width:52px;height:52px;border-radius:50%;display:grid;place-items:center;border:2px dashed var(--cc);color:var(--cc);transition:transform .15s}
+.d-ring svg{width:24px;height:24px}
+.d-btn:hover .d-ring{transform:translateY(-2px)}
+.d-btn.done .d-ring{border-style:solid;background:var(--cc);color:var(--bg)}
+.d-l{font-size:12.5px;font-weight:800;white-space:nowrap}
+.d-es{font-family:var(--display);font-style:italic;font-size:12.5px;color:var(--muted);white-space:nowrap}
+@media (max-width:380px){ .d-ring{width:44px;height:44px} .d-l{font-size:11.5px} }
+
+/* levels */
+.levels{display:grid;gap:12px;margin-bottom:14px}
 .levels-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px;flex-wrap:wrap}
-.levels-head h2{font-family:var(--display);font-weight:400;font-size:20px}
-.levels-total{color:var(--muted);font-size:14px;font-variant-numeric:tabular-nums}
-.lvl-row{display:grid;grid-template-columns:auto minmax(96px,auto) minmax(0,1fr) 3.2em;align-items:center;gap:10px}
-.lvl-row .band-code{font-size:12px}
+.levels-head h2,.card-h{font-family:var(--display);font-weight:500;font-size:21px}
+.levels-total{color:var(--muted);font-size:13.5px;font-variant-numeric:tabular-nums}
+.lvl-row{display:grid;grid-template-columns:auto minmax(92px,auto) minmax(0,1fr) 3.2em;align-items:center;gap:10px}
+.band-code{font-family:var(--body);font-weight:800;font-size:11.5px;letter-spacing:.08em;color:var(--accent);border:1.5px solid currentColor;border-radius:6px;padding:1px 6px}
 .lvl-name{font-weight:700;display:flex;flex-direction:column;line-height:1.2}
-.lvl-name small{font-weight:400;color:var(--muted);font-size:12px}
+.lvl-name small{font-weight:500;color:var(--muted);font-size:12px}
 .lvl-row:not(.active) .lvl-name{color:var(--muted)}
-.lvl-bar{display:block;height:12px;border-radius:6px;background:var(--sunk);overflow:hidden}
-.lvl-bar span{display:block;height:100%;border-radius:6px;background:var(--accent);transition:width .5s ease}
+.lvl-bar{display:block;height:10px;border-radius:5px;background:var(--sunk);overflow:hidden}
+.lvl-bar span{display:block;height:100%;border-radius:5px;background:var(--accent);transition:width .6s ease}
 .lvl-row.full .lvl-bar span{background:var(--good)}
-.lvl-pct{text-align:right;font-weight:700;font-variant-numeric:tabular-nums}
-.band-pct{margin-left:auto;font-family:var(--body);font-size:14px;font-weight:700;color:var(--muted);font-variant-numeric:tabular-nums}
-.practice{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:28px}
-.practice .btn{flex:1 1 160px}
-.band{display:flex;align-items:baseline;gap:10px;font-family:var(--display);font-weight:400;font-size:22px;margin:26px 0 10px}
-.band-code{font-family:var(--body);font-weight:700;font-size:13px;letter-spacing:.08em;color:var(--accent);border:2px solid var(--accent);border-radius:6px;padding:1px 7px}
+.lvl-pct{text-align:right;font-weight:800;font-variant-numeric:tabular-nums}
+
+/* nudge / tiles */
+.nudge,.tile-card{width:100%;text-align:left;display:grid;gap:6px;border-left:3px solid var(--cc);margin-bottom:14px}
+.nudge-t{font-family:var(--display);font-size:23px;font-weight:500;line-height:1.2}
+.tile-card:disabled{opacity:.55}
+.tile-card:not(:disabled):hover,.nudge:hover{background:var(--sunk)}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-bottom:14px}
+.grid .tile-card{margin:0}
+.big-num{font-family:var(--display);font-size:46px;line-height:1;margin:8px 0;font-variant-numeric:tabular-nums}
+.big-num small{font-family:var(--body);font-size:15px;color:var(--muted)}
+
+/* unit path */
+.band{display:flex;align-items:center;gap:10px;font-family:var(--display);font-weight:500;font-size:24px;margin:28px 0 12px}
+.band-pct{margin-left:auto;font-family:var(--body);font-size:13.5px;font-weight:800;color:var(--muted);font-variant-numeric:tabular-nums}
 .path{list-style:none;margin:0;padding:0;display:grid;gap:8px}
-.unit{display:grid;grid-template-columns:44px minmax(0,1fr) auto;align-items:center;gap:14px;background:var(--surface);border-radius:var(--r);padding:12px 14px;border:2px solid transparent}
-.unit.current{border-color:var(--accent)}
-.unit.locked .unit-t,.unit.locked .unit-n{opacity:.55}
-.unit-n{width:44px;height:44px;border-radius:10px;display:grid;place-items:center;background:var(--sunk);font-weight:700;font-variant-numeric:tabular-nums;color:var(--muted)}
-.unit.current .unit-n{background:var(--accent);color:var(--on-accent)}
+.unit{display:grid;grid-template-columns:42px minmax(0,1fr) auto;align-items:center;gap:14px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:12px 14px}
+.unit.current{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent) inset}
+.unit.locked .unit-t,.unit.locked .unit-n{opacity:.5}
+.unit-n{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;border:1.5px solid var(--line);font-weight:800;font-variant-numeric:tabular-nums;color:var(--muted)}
+.unit.current .unit-n{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.unit.mastered .unit-n{background:var(--good-bg);border-color:var(--good);color:var(--good)}
 .unit-t{display:flex;flex-direction:column;min-width:0}
-.unit-es{font-family:var(--display);font-size:19px;line-height:1.25}
-.unit-en{color:var(--muted);font-size:14px}
-.pips{display:flex;gap:4px;margin-top:6px}
-.pips span{width:14px;height:6px;border-radius:2px;background:var(--sunk)}
+.unit-es{font-family:var(--display);font-size:20px;font-weight:500;line-height:1.25}
+.unit-en{color:var(--muted);font-size:13.5px}
+.pips{display:flex;gap:4px;margin-top:7px}
+.pips span{width:16px;height:4px;border-radius:2px;background:var(--sunk)}
 .pips span.on{background:var(--sun)}
 .unit-actions{display:flex;gap:4px;align-items:center;justify-content:flex-end;flex-wrap:wrap}
-.foot{color:var(--muted);font-size:14px;margin-top:28px;text-align:center}
+.foot{color:var(--muted);font-size:13.5px;margin-top:28px;text-align:center}
+
+/* scroll */
+.filters{display:flex;gap:8px;overflow-x:auto;padding-bottom:14px;margin-bottom:4px;scrollbar-width:none;border-bottom:1px solid var(--line)}
+.filters::-webkit-scrollbar{display:none}
+.feed{display:grid;gap:14px;padding-top:14px}
+.sc-card{display:grid;gap:12px;border-top:3px solid var(--cc);padding:18px 20px 20px}
+.sc-head{display:flex;justify-content:space-between;align-items:center;gap:10px;min-height:32px}
+.keep{width:36px;height:36px;border-radius:50%;border:0;background:transparent;color:var(--muted);display:grid;place-items:center}
+.keep svg{width:20px;height:20px;fill:none}
+.keep svg path{fill:transparent;stroke:currentColor;stroke-width:2;stroke-linejoin:round}
+.keep[aria-pressed="true"]{color:var(--accent)}
+.keep[aria-pressed="true"] svg path{fill:currentColor}
+.sc-row{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.sc-es{font-family:var(--display);font-size:clamp(26px,7vw,34px);font-weight:500;line-height:1.2;margin:0;min-width:0;overflow-wrap:anywhere}
+.sc-en{margin:0;font-size:18px;font-weight:600}
+.sc-meta{margin:0;color:var(--muted);font-size:13.5px}
+.sc-title{font-family:var(--display);font-weight:500;font-size:26px;line-height:1.2}
+.sc-title.big{font-size:32px}
+.sc-text{color:var(--muted);max-width:62ch}
+.sc-text p{margin:0 0 .6em} .sc-text p:last-child{margin:0}
+.sc-text i,.sc-text b,.tip i{font-style:normal;font-weight:700;color:var(--ink)}
+.sc-q{margin:0;font-size:18px;font-weight:600}
+.sc-ex{margin:0;font-size:18px;font-style:italic}
+.sc-answer{display:grid;gap:8px;border-top:1px dashed var(--line);padding-top:12px}
+.sc-answer p{margin:0}
+.reveal{justify-self:start;background:none;border:0;padding:0;color:var(--cc);font-weight:700}
+.more{text-align:center;color:var(--muted);font-size:13px;padding:24px 0}
+
+/* listen */
+.player{display:grid;gap:14px;margin-bottom:14px}
+.lbl{font-weight:700;font-size:14px;color:var(--muted)}
+.now{background:var(--sunk);border-radius:12px;padding:22px 16px;text-align:center;min-height:128px;display:grid;align-content:center;gap:6px}
+.ls-es{margin:0;font-family:var(--display);font-size:clamp(24px,6.6vw,32px);font-weight:500;line-height:1.2;overflow-wrap:anywhere}
+.ls-en{margin:0;color:var(--muted)}
+.ls-track{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center}
+.ls-track .meter span{background:var(--accent)}
+.ls-count{font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+.controls{display:flex;align-items:center;justify-content:center;gap:22px}
+.ctl{width:52px;height:52px}
+.big-play{width:76px;height:76px;border-radius:50%;border:0;background:var(--accent);color:var(--on-accent);display:grid;place-items:center;box-shadow:0 4px 0 var(--accent-2)}
+.big-play svg{width:34px;height:34px}
+.narrs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:12px 0}
+.narr{display:grid;gap:8px;border:1.5px solid var(--line);border-radius:12px;padding:10px}
+.narr.on{border-color:var(--accent);background:var(--accent-soft)}
+.narr-pick{display:flex;align-items:center;gap:10px;background:none;border:0;padding:0;text-align:left;min-width:0}
+.narr-pick small{display:block;color:var(--muted);font-size:12.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.narr-a{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;background:var(--sunk);font-family:var(--display);flex:none}
+select{width:100%;padding:11px 12px;border-radius:10px;border:1.5px solid var(--line);background:var(--sunk)}
+
+/* me */
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:14px 0}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:2px;min-width:0}
+.stat-k{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:800}
+.stat-v{font-size:22px;font-weight:800;font-variant-numeric:tabular-nums;line-height:1.2;white-space:nowrap}
+.stat-v small{font-size:13px;color:var(--muted);font-weight:500}
+.settings{display:grid;gap:16px}
+.settings h3{font-family:var(--display);font-weight:500;font-size:19px;margin-top:6px}
+.me-bar{margin-top:10px}
+
+/* bottom nav */
+.nav{position:fixed;left:0;right:0;bottom:0;z-index:8;background:var(--surface);border-top:1px solid var(--line);
+  padding:6px max(8px, env(safe-area-inset-right, 0px)) calc(6px + env(safe-area-inset-bottom, 0px)) max(8px, env(safe-area-inset-left, 0px))}
+.nav-in{max-width:620px;margin:0 auto;display:grid;grid-template-columns:repeat(5,minmax(0,1fr))}
+.nav-b{position:relative;display:grid;justify-items:center;gap:3px;background:none;border:0;padding:8px 2px 6px;font-size:12px;font-weight:700;color:var(--muted)}
+.nav-i{display:inline-flex} .nav-i svg{width:22px;height:22px}
+.nav-b.on{color:var(--accent)}
+.nav-b.on::before{content:"";position:absolute;top:-7px;left:28%;right:28%;height:3px;border-radius:0 0 3px 3px;background:var(--accent)}
+
 @media (max-width:520px){
-  .unit{grid-template-columns:44px minmax(0,1fr)}
+  .unit{grid-template-columns:42px minmax(0,1fr)}
   .unit-actions{grid-column:2;justify-content:flex-start}
-  .stat-v{font-size:20px}
-  .stats{gap:6px} .stat{padding:10px}
+  .stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .grid{grid-template-columns:minmax(0,1fr)}
+  .lvl-row{grid-template-columns:auto minmax(0,1fr) 3em}
+  .lvl-row .lvl-bar{grid-column:1 / -1;grid-row:2}
+  .pill{padding:5px 10px}
 }
 
 /* lesson */
 .lesson-top{display:flex;align-items:center;gap:12px;margin-bottom:24px}
 .lesson-top .icon-btn{background:transparent;color:var(--muted)}
-.track{flex:1;height:12px;border-radius:6px;background:var(--sunk);overflow:hidden}
-#bar-fill{display:block;height:100%;width:0;background:var(--good);border-radius:6px;transition:width .35s ease}
-.quit{display:flex;flex-wrap:wrap;align-items:center;gap:8px;background:var(--surface);border-radius:var(--r);padding:12px 14px;margin:-12px 0 20px}
+.track{flex:1;height:10px;border-radius:5px;background:var(--sunk);overflow:hidden}
+#bar-fill{display:block;height:100%;width:0;background:var(--accent);border-radius:5px;transition:width .35s ease}
+.quit{display:flex;flex-wrap:wrap;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:12px 14px;margin:-12px 0 20px}
 .quit span{flex:1 1 200px}
 .ex{display:flex;flex-direction:column;gap:18px}
 .ex.in{animation:rise .25s ease both}
 @keyframes rise{from{transform:translateY(8px);opacity:.4}to{transform:none;opacity:1}}
-.ex-label{margin:0;font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.ex-label{margin:0;font-size:12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
 .ex-label.new{color:var(--sun)}
 .big-row{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
-.big{font-family:var(--display);font-size:clamp(28px, 7vw, 40px);line-height:1.2;min-width:0;overflow-wrap:anywhere}
-.big.long{font-size:clamp(22px, 5.4vw, 30px)}
+.big{font-family:var(--display);font-weight:500;font-size:clamp(30px,7.6vw,42px);line-height:1.2;min-width:0;overflow-wrap:anywhere}
+.big.long{font-size:clamp(24px,5.8vw,32px)}
 .audio{display:flex;gap:8px;align-items:center}
 .listen{display:flex;justify-content:center;padding:18px 0}
 .listen .icon-btn.big{width:84px;height:84px} .listen .icon-btn.big svg{width:40px;height:40px}
@@ -140,49 +275,47 @@ main{max-width:640px;margin:0 auto;padding-block:20px 140px}
 .hint{margin:-8px 0 0;color:var(--muted);font-style:italic}
 .intro-en{font-size:22px;margin:0}
 .options{display:grid;gap:10px}
-.opt{display:flex;align-items:center;gap:12px;text-align:left;background:var(--surface);border:2px solid var(--line);border-radius:var(--r);padding:12px 14px;box-shadow:0 2px 0 var(--line)}
-.opt .k{width:26px;height:26px;border-radius:6px;border:2px solid var(--line);display:grid;place-items:center;font-size:13px;color:var(--muted);flex:none}
+.opt{display:flex;align-items:center;gap:12px;text-align:left;background:var(--surface);border:1.5px solid var(--line);border-radius:12px;padding:12px 14px;box-shadow:0 2px 0 var(--line)}
+.opt .k{width:26px;height:26px;border-radius:6px;border:1.5px solid var(--line);display:grid;place-items:center;font-size:12px;color:var(--muted);flex:none}
 .opt[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft);box-shadow:0 2px 0 var(--accent)}
 .opt.right{border-color:var(--good);background:var(--good-bg);box-shadow:none}
 .opt.wrong{border-color:var(--bad);background:var(--bad-bg);box-shadow:none}
 .line{min-height:64px;display:flex;flex-wrap:wrap;gap:8px;align-content:flex-start;padding:8px 0;
-  background:repeating-linear-gradient(to bottom, transparent 0 55px, var(--line) 55px 57px)}
+  background:repeating-linear-gradient(to bottom, transparent 0 55px, var(--line) 55px 56px)}
 .bank{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;padding-top:8px}
-.tile{background:var(--surface);border:2px solid var(--line);border-radius:10px;padding:8px 14px;box-shadow:0 2px 0 var(--line)}
+.tile{background:var(--surface);border:1.5px solid var(--line);border-radius:10px;padding:8px 14px;box-shadow:0 2px 0 var(--line)}
 .tile.gone{background:var(--sunk);color:transparent;box-shadow:none;border-color:var(--sunk)}
-.answer{width:100%;font-size:20px;padding:14px 16px;border-radius:var(--r);border:2px solid var(--line);background:var(--surface)}
+.answer{width:100%;font-size:20px;padding:14px 16px;border-radius:12px;border:1.5px solid var(--line);background:var(--surface)}
 .answer:focus{outline:none;border-color:var(--accent)}
 .answer.right{border-color:var(--good);background:var(--good-bg)}
 .answer.wrong{border-color:var(--bad);background:var(--bad-bg)}
 .accents{display:flex;flex-wrap:wrap;gap:6px;margin-top:-6px}
-.key{min-width:40px;height:40px;border-radius:8px;border:2px solid var(--line);background:var(--surface);font-size:18px}
-.conj{display:grid;gap:4px;background:var(--surface);border-radius:var(--r);padding:16px 18px;border-left:6px solid var(--sun)}
-.conj-verb{font-family:var(--display);font-size:32px;line-height:1.1}
+.key{min-width:40px;height:40px;border-radius:8px;border:1.5px solid var(--line);background:var(--surface);font-size:18px}
+.conj{display:grid;gap:4px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px 18px;border-left:4px solid var(--sun)}
+.conj-verb{font-family:var(--display);font-size:34px;line-height:1.1}
 .conj-meta{color:var(--muted)}
-.conj-person{font-size:22px;font-weight:700}
-.fill-line{font-family:var(--display);font-size:clamp(22px,5.4vw,30px);line-height:1.6;margin:0}
+.conj-person{font-size:22px;font-weight:800}
+.fill-line{font-family:var(--display);font-size:clamp(24px,5.8vw,32px);line-height:1.6;margin:0}
 .blank{display:inline-block;min-width:4ch;border-bottom:3px solid var(--accent);padding:0 6px;color:var(--accent)}
 .blank.right{border-color:var(--good);color:var(--good)} .blank.wrong{border-color:var(--bad);color:var(--bad)}
 .hint.en{font-style:normal}
-.chips{display:flex;flex-wrap:wrap;gap:8px}
-.chip{background:var(--surface);border:2px solid var(--line);border-radius:999px;padding:8px 16px}
-.chip[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft)}
+.chips .chip{letter-spacing:0;font-size:15px;font-weight:600}
 .match{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .col{display:grid;gap:10px;align-content:start;min-width:0}
-.pair{background:var(--surface);border:2px solid var(--line);border-radius:var(--r);padding:12px;min-height:52px;box-shadow:0 2px 0 var(--line);overflow-wrap:anywhere}
+.pair{background:var(--surface);border:1.5px solid var(--line);border-radius:12px;padding:12px;min-height:52px;box-shadow:0 2px 0 var(--line);overflow-wrap:anywhere}
 .pair[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft)}
 .pair.done{opacity:.35;box-shadow:none;border-color:var(--good)}
 .shake{animation:shake .35s; border-color:var(--bad)!important}
 @keyframes shake{25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
 .chat{display:flex;flex-direction:column;gap:8px}
-.bubble{max-width:85%;text-align:left;display:flex;flex-direction:column;border:0;border-radius:16px;padding:10px 14px;background:var(--surface)}
+.bubble{max-width:85%;text-align:left;display:flex;flex-direction:column;border:1px solid var(--line);border-radius:16px;padding:10px 14px;background:var(--surface)}
 .bubble.l{align-self:flex-start;border-bottom-left-radius:4px}
-.bubble.r{align-self:flex-end;border-bottom-right-radius:4px;background:var(--accent-soft)}
-.bubble .who{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.bubble.r{align-self:flex-end;border-bottom-right-radius:4px;background:var(--accent-soft);border-color:transparent}
+.bubble .who{font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
 .bubble .tr{display:none;color:var(--muted);font-size:15px}
 .bubble.shown .tr{display:block}
-.reply-cue{margin:4px 0 -8px;font-weight:700}
-.mic{display:flex;align-items:center;justify-content:center;gap:10px;border:0;border-radius:999px;padding:16px 24px;background:var(--accent);color:var(--on-accent);font-weight:700;box-shadow:0 3px 0 var(--accent-2)}
+.reply-cue{margin:4px 0 -8px;font-weight:800}
+.mic{display:flex;align-items:center;justify-content:center;gap:10px;border:0;border-radius:999px;padding:16px 24px;background:var(--accent);color:var(--on-accent);font-weight:800;box-shadow:0 3px 0 var(--accent-2)}
 .mic svg{width:24px;height:24px}
 .mic.on{background:var(--bad);box-shadow:0 3px 0 var(--bad);animation:pulse 1s infinite}
 @keyframes pulse{50%{transform:scale(1.03)}}
@@ -190,75 +323,73 @@ main{max-width:640px;margin:0 auto;padding-block:20px 140px}
 .w{border-bottom:2px dotted var(--muted);cursor:help;border-radius:2px}
 .w:hover,.w.on{color:var(--accent);border-bottom-color:var(--accent);background:var(--accent-soft)}
 .cue{margin:-6px 0 0;font-size:14px;color:var(--muted)}
-.tip{position:fixed;z-index:40;max-width:260px;background:var(--ink);color:var(--bg);font-family:var(--body);font-size:15px;line-height:1.35;padding:7px 11px;border-radius:8px;pointer-events:none;box-shadow:0 4px 14px rgba(0,0,0,.25)}
+.wtip{position:fixed;z-index:40;max-width:260px;background:var(--ink);color:var(--bg);font-family:var(--body);font-weight:600;font-size:14.5px;line-height:1.35;padding:7px 11px;border-radius:8px;pointer-events:none;box-shadow:0 6px 18px rgba(0,0,0,.35)}
 
 /* check bar */
-.checkbar{position:fixed;left:0;right:0;bottom:0;z-index:5;background:var(--surface);border-top:2px solid var(--line);
+.checkbar{position:fixed;left:0;right:0;bottom:0;z-index:5;background:var(--surface);border-top:1px solid var(--line);
   padding:14px max(16px, env(safe-area-inset-right, 0px)) calc(14px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px))}
-.checkbar-in{max-width:640px;margin:0 auto;display:flex;flex-wrap:wrap;align-items:center;gap:12px}
+.checkbar-in{max-width:620px;margin:0 auto;display:flex;flex-wrap:wrap;align-items:center;gap:12px}
 #bar-msg{flex:1 1 260px;display:flex;flex-direction:column;gap:2px;min-width:0;color:var(--muted)}
 #bar-msg:empty{display:none}
 #bar-btn{flex:1 1 160px}
 .checkbar.good{background:var(--good-bg);border-color:var(--good)}
 .checkbar.good #bar-msg{color:var(--good)}
-.checkbar.good #bar-btn{background:var(--good);color:var(--surface);box-shadow:0 3px 0 var(--ink)}
+.checkbar.good #bar-btn{background:var(--good);color:var(--bg);box-shadow:none}
 .checkbar.bad{background:var(--bad-bg);border-color:var(--bad)}
 .checkbar.bad #bar-msg{color:var(--bad)}
-.checkbar.bad #bar-btn{background:var(--bad);color:var(--surface);box-shadow:0 3px 0 var(--ink)}
-.verdict{font-family:var(--display);font-weight:400;font-size:22px}
+.checkbar.bad #bar-btn{background:var(--bad);color:var(--bg);box-shadow:none}
+.verdict{font-family:var(--display);font-weight:500;font-size:24px}
 .mean{color:var(--ink);font-style:italic}
 
 /* done */
 .done-card{display:flex;flex-direction:column;gap:18px;padding-top:24px}
-.eyebrow{margin:0;font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--sun)}
-.done-card h2{font-family:var(--display);font-weight:400;font-size:clamp(28px,7vw,38px);line-height:1.15}
+.done-card h2{font-family:var(--display);font-weight:500;font-size:clamp(30px,7.6vw,40px);line-height:1.15}
 .done-note{margin:0;color:var(--muted)}
 .done-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:0}
-.done-stats div{background:var(--surface);border-radius:var(--r);padding:12px 14px}
-.done-stats dt{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:700}
-.done-stats dd{margin:0;font-size:26px;font-weight:700;font-variant-numeric:tabular-nums}
-.missed h3,.sheet-body h3{font-family:var(--display);font-weight:400;font-size:20px;margin:6px 0 8px}
+.done-stats div{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+.done-stats dt{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:800}
+.done-stats dd{margin:0;font-size:26px;font-weight:800;font-variant-numeric:tabular-nums}
+.done-card .levels{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px 16px}
+.missed h3,.sheet-body h3{font-family:var(--display);font-weight:500;font-size:21px;margin:6px 0 8px}
 .missed ul,.vocab{list-style:none;margin:0;padding:0;display:grid;gap:2px}
-.missed li,.vocab li{display:grid;grid-template-columns:32px minmax(0,1fr) minmax(0,1fr);gap:10px;align-items:center;padding:6px 0;border-bottom:1px solid var(--line)}
+.missed li,.vocab li{display:grid;grid-template-columns:32px minmax(0,1fr) minmax(0,1fr);gap:10px;align-items:center;padding:7px 0;border-bottom:1px solid var(--line)}
 .m-es{font-weight:700} .m-en{color:var(--muted)}
 
 /* sheet */
-.sheet{position:fixed;inset:0;z-index:20;background:rgba(10,16,32,.5);display:flex;justify-content:center;align-items:flex-end}
-.sheet-panel{background:var(--bg);width:100%;max-width:680px;max-height:92%;overflow:auto;border-radius:18px 18px 0 0;
+.sheet{position:fixed;inset:0;z-index:20;background:rgba(8,6,4,.6);display:flex;justify-content:center;align-items:flex-end}
+.sheet-panel{background:var(--bg);width:100%;max-width:660px;max-height:92%;overflow:auto;border-radius:20px 20px 0 0;border:1px solid var(--line);border-bottom:0;
   padding:18px max(18px, env(safe-area-inset-right, 0px)) calc(28px + env(safe-area-inset-bottom, 0px)) max(18px, env(safe-area-inset-left, 0px))}
 .sheet-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px}
-.sheet-head h2{font-family:var(--display);font-weight:400;font-size:28px}
+.sheet-head h2{font-family:var(--display);font-weight:500;font-size:30px}
 .sheet-body{display:flex;flex-direction:column;gap:14px}
-.tip{background:var(--surface);border-radius:var(--r);padding:4px 18px;max-width:65ch}
-.tip i{font-style:normal;font-weight:700;color:var(--accent)}
+.tip{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:4px 18px;max-width:65ch;color:var(--muted)}
 .vt-wrap{overflow-x:auto}
-.vt{border-collapse:collapse;min-width:280px;background:var(--surface);border-radius:var(--r);overflow:hidden}
-.vt caption{text-align:left;font-weight:700;padding:0 0 6px}
-.vt th,.vt td{padding:6px 14px;border-bottom:1px solid var(--line);text-align:left}
-.vt th{color:var(--muted);font-weight:400}
-.vt td{font-weight:700}
+.vt{border-collapse:collapse;min-width:280px;background:var(--surface);border-radius:12px;overflow:hidden}
+.vt caption{text-align:left;font-weight:800;padding:0 0 6px}
+.vt th,.vt td{padding:7px 14px;border-bottom:1px solid var(--line);text-align:left}
+.vt th{color:var(--muted);font-weight:500}
+.vt td{font-weight:800}
 .field{display:grid;gap:8px;justify-items:start}
-.field>label{font-weight:700}
+.field>label{font-weight:800}
+.field select{max-width:100%}
 .range{display:flex;align-items:center;gap:12px;width:100%}
 .range input{flex:1;accent-color:var(--accent)}
-select{padding:8px 12px;border-radius:8px;border:2px solid var(--line);background:var(--surface)}
 .switch{display:flex;gap:12px;align-items:flex-start;font-weight:700}
 .switch input{width:22px;height:22px;accent-color:var(--accent);margin-top:2px;flex:none}
-.switch small{display:block;font-weight:400;color:var(--muted)}
-.small{font-size:14px;color:var(--muted);margin:0}
-textarea{width:100%;border-radius:8px;border:2px solid var(--line);background:var(--surface);padding:10px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px;resize:vertical}
-.status{margin:0;font-weight:700;color:var(--accent);min-height:1.5em}
-.confirm{display:flex;flex-wrap:wrap;gap:8px;align-items:center;background:var(--bad-bg);border-radius:var(--r);padding:12px}
-.confirm span{flex:1 1 200px;color:var(--bad);font-weight:700}
+.switch small{display:block;font-weight:500;color:var(--muted)}
+textarea{width:100%;border-radius:10px;border:1.5px solid var(--line);background:var(--sunk);padding:10px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px;resize:vertical}
+.status{margin:0;font-weight:800;color:var(--accent);min-height:1.5em}
+.confirm{display:flex;flex-wrap:wrap;gap:8px;align-items:center;background:var(--bad-bg);border-radius:12px;padding:12px}
+.confirm span{flex:1 1 200px;color:var(--bad);font-weight:800}
 
-.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(24px + env(safe-area-inset-bottom, 0px));z-index:30;background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:999px;font-weight:700;max-width:calc(100% - 32px)}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(84px + env(safe-area-inset-bottom, 0px));z-index:30;background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:999px;font-weight:700;max-width:calc(100% - 32px);text-align:center}
 @media (prefers-reduced-motion: reduce){ *{animation:none!important;transition:none!important} }
 </style>
 
 </head>
 <body>
 <main>
-  <section id="home" aria-label="Course"></section>
+  <section id="home" aria-label="Ruta"></section>
 
   <section id="lesson" hidden aria-label="Lesson">
     <div class="lesson-top">
@@ -282,6 +413,8 @@ textarea{width:100%;border-radius:8px;border:2px solid var(--line);background:va
   <section id="done" hidden aria-label="Results"></section>
 </main>
 
+<nav id="nav" class="nav" aria-label="Sections"></nav>
+
 <div id="sheet" class="sheet" hidden role="dialog" aria-modal="true" aria-labelledby="sheet-title">
   <div class="sheet-panel">
     <div class="sheet-head"><h2 id="sheet-title"></h2>
@@ -290,7 +423,7 @@ textarea{width:100%;border-radius:8px;border:2px solid var(--line);background:va
   </div>
 </div>
 <div id="toast" class="toast" hidden role="status"></div>
-<div id="tip" class="tip" hidden role="tooltip"></div>
+<div id="wtip" class="wtip" hidden role="tooltip"></div>
 <script>
 /* Ruta Spanish — course content.
    Format for words and sentences:  "Spanish|alt Spanish = English|alt English ~ optional hint"
@@ -598,6 +731,124 @@ const GLOSS = {
   viajar:'to travel', viejo:'old', viernes:'Friday', vimos:'we saw', viven:'they live', vives:'you live', vivo:'I live',
   'viví':'I lived', voy:'I go', y:'and', yo:'I', 'él':'he'
 };
+
+/* Scroll feed extras. Culture: [title, text]. False friends: [spanish, looks like, really means, example]. */
+const CULTURE = [
+  ['Two kisses hello', 'In Spain, friends and new acquaintances often greet with <i>dos besos</i>, a light cheek-to-cheek on each side, starting with your right cheek to their right cheek. Men greeting other men usually shake hands instead.'],
+  ['Dinner at ten', 'Spaniards eat late. Lunch, the big meal, is often around 2 pm and dinner can be 9 or 10 pm. A restaurant may be empty at 7 pm and full at 10.'],
+  ['Sobremesa', '<i>La sobremesa</i> is the time spent chatting around the table after a meal is finished. There is no single English word for it, which says something about the culture.'],
+  ['Where "tapa" comes from', '<i>Tapa</i> means "lid" or "cover". A popular story says bars once covered drinks with a slice of bread or ham to keep flies out, and the snack took the name.'],
+  ['¡Ojalá!', '<i>Ojalá</i> means "I hope so" or "if only". It comes from Arabic, roughly "if God wills", a trace of the centuries of Moorish rule in Spain. Thousands of Spanish words have Arabic roots.'],
+  ['Words from Arabic', 'Many Spanish words starting with <i>al-</i> come from Arabic: <i>almohada</i> (pillow), <i>azúcar</i> (sugar), <i>aceite</i> (oil), <i>alcalde</i> (mayor).'],
+  ['Vale', 'In Spain you will hear <i>vale</i> constantly. It means "OK" or "sounds good": <i>¿Quedamos a las ocho? — Vale.</i>'],
+  ['¿Mande?', 'In Mexico, if you didn\'t hear someone, a polite reply is <i>¿Mande?</i>, meaning "pardon?". In Spain people usually say <i>¿Cómo?</i> or <i>¿Perdón?</i>'],
+  ['Ahorita', 'In Mexico <i>ahorita</i> literally means "right now", but it can mean anything from "this second" to "sometime later". Context and tone tell you which.'],
+  ['Upside-down marks', 'The opening <b>¿</b> and <b>¡</b> warn you a question or exclamation is coming, which matters because Spanish word order often doesn\'t change for questions: <i>¿Tienes hambre?</i> vs <i>Tienes hambre.</i>'],
+  ['Days named after planets', 'Most weekdays come from the planets and Roman gods: <i>lunes</i> (Moon), <i>martes</i> (Mars), <i>miércoles</i> (Mercury), <i>jueves</i> (Jupiter), <i>viernes</i> (Venus).'],
+  ['Castellano or español?', 'Both names are correct. <i>Castellano</i> (Castilian) is common in Spain and parts of South America, where it separates it from other languages of Spain like Catalan, Galician and Basque.'],
+  ['Vosotros on the map', '<i>Vosotros</i> (you all, informal) is used almost only in Spain. In Latin America, <i>ustedes</i> covers every group of "you", formal or not.'],
+  ['The biggest Spanish-speaking country', 'Mexico has more Spanish speakers than any other country, far more than Spain. The United States also has tens of millions of Spanish speakers.'],
+  ['La Tomatina', 'On the last Wednesday of August, the town of Buñol near Valencia holds <i>La Tomatina</i>, a huge street fight where thousands of people throw ripe tomatoes at each other.'],
+  ['Día de Muertos', 'In Mexico, <i>Día de Muertos</i> (1–2 November) honours loved ones who have died, with altars called <i>ofrendas</i>, marigold flowers, photos and their favourite foods.'],
+  ['The Camino de Santiago', 'Pilgrims have walked the <i>Camino de Santiago</i> for centuries to Santiago de Compostela in Galicia. Today many walk it for the scenery, the people and the challenge.'],
+  ['Guiri', 'Spaniards jokingly call foreign tourists <i>guiris</i>. It\'s usually friendly teasing, especially for anyone sunburnt in sandals and socks.'],
+  ['Tú or usted?', 'Use <i>usted</i> with older people, officials and in formal service. In Spain, people switch to <i>tú</i> quickly, so if someone uses <i>tú</i> with you, it\'s fine to do the same.'],
+  ['Buenas', 'A casual all-purpose greeting is just <i>¡Buenas!</i>, short for <i>buenas tardes</i> or <i>buenos días</i>. You\'ll hear it walking into shops and bars.'],
+  ['The Real Academia', 'The <i>Real Academia Española</i>, founded in 1713, publishes the official dictionary and spelling rules. Its motto is <i>Limpia, fija y da esplendor</i>: "it cleans, fixes and gives splendour".'],
+  ['Spanish sounds out loud', 'Spanish is very phonetic: once you know the rules, you can pronounce almost any word you read. Unlike English, the vowels always keep the same sound.']
+];
+const FALSE_FRIENDS = [
+  ['embarazada', 'embarrassed', 'pregnant', 'Mi hermana está embarazada.'],
+  ['constipado', 'constipated', 'having a cold', 'Estoy constipado, no puedo salir.'],
+  ['éxito', 'exit', 'success', 'La película fue un gran éxito.'],
+  ['librería', 'library', 'bookshop', 'Compré un libro en la librería.'],
+  ['carpeta', 'carpet', 'folder', 'Los papeles están en la carpeta.'],
+  ['sensible', 'sensible', 'sensitive', 'Es una persona muy sensible.'],
+  ['actual', 'actual', 'current', 'El presidente actual es joven.'],
+  ['realizar', 'to realise', 'to carry out', 'Vamos a realizar un proyecto.'],
+  ['asistir', 'to assist', 'to attend', 'Voy a asistir a la reunión.'],
+  ['molestar', 'to molest', 'to bother', 'No quiero molestar.'],
+  ['ropa', 'rope', 'clothes', 'Tengo mucha ropa.'],
+  ['once', 'once', 'eleven', 'Son las once.']
+];
+
+/* Daily five. Word of the day: [spanish, english, example, example in English]. */
+const WORD_DAY = [
+  ['la sobremesa','time chatting at the table after a meal','Nos quedamos de sobremesa dos horas.','We stayed chatting at the table for two hours.'],
+  ['madrugar','to get up early','Mañana tengo que madrugar.','Tomorrow I have to get up early.'],
+  ['el mercado','market','Compro fruta en el mercado.','I buy fruit at the market.'],
+  ['la merienda','afternoon snack','La merienda es a las seis.','The afternoon snack is at six.'],
+  ['disfrutar','to enjoy','¡Disfruta tu viaje!','Enjoy your trip!'],
+  ['quizás','maybe, perhaps','Quizás vamos mañana.','Maybe we\'ll go tomorrow.'],
+  ['el sobrino','nephew','Mi sobrino tiene cinco años.','My nephew is five years old.'],
+  ['aprovechar','to make the most of','Hay que aprovechar el sol.','You have to make the most of the sun.'],
+  ['la madrugada','the early hours (after midnight)','Llegamos a las tres de la madrugada.','We arrived at three in the morning.'],
+  ['el atasco','traffic jam','Hay un atasco en la autopista.','There\'s a traffic jam on the motorway.'],
+  ['ahorrar','to save (money)','Quiero ahorrar para un coche.','I want to save for a car.'],
+  ['el cumpleaños','birthday','¡Feliz cumpleaños!','Happy birthday!'],
+  ['la sombra','shade, shadow','Vamos a la sombra.','Let\'s go into the shade.'],
+  ['charlar','to chat','Me gusta charlar con mis amigos.','I like chatting with my friends.'],
+  ['el fin de semana','weekend','¿Qué haces el fin de semana?','What are you doing at the weekend?'],
+  ['despacio','slowly','Habla más despacio, por favor.','Speak more slowly, please.'],
+  ['tener sueño','to be sleepy','Tengo mucho sueño.','I\'m really sleepy.'],
+  ['probar','to try, to taste','¿Quieres probar la paella?','Do you want to try the paella?'],
+  ['olvidar','to forget','No olvides las llaves.','Don\'t forget the keys.'],
+  ['la plaza','town square','Quedamos en la plaza.','Let\'s meet in the square.'],
+  ['quedar','to meet up','¿Quedamos a las ocho?','Shall we meet at eight?'],
+  ['el vecino','neighbour','Mi vecino es muy amable.','My neighbour is very kind.'],
+  ['amable','kind','Gracias, eres muy amable.','Thanks, you\'re very kind.'],
+  ['por fin','at last','¡Por fin es viernes!','At last it\'s Friday!'],
+  ['la ola','wave (at sea)','Las olas son grandes hoy.','The waves are big today.'],
+  ['el gasto','expense','Tengo muchos gastos este mes.','I have a lot of expenses this month.'],
+  ['acordarse','to remember','No me acuerdo de su nombre.','I don\'t remember his name.'],
+  ['tranquilo','calm, relaxed','Tranquilo, no pasa nada.','Relax, it\'s no big deal.'],
+  ['el viaje','trip, journey','¡Buen viaje!','Have a good trip!'],
+  ['el consejo','piece of advice','Te doy un consejo.','Let me give you some advice.']
+];
+/* Real life: [situation, spanish, english, tip]. */
+const PRACTICAL = [
+  ['Emergency','¡Ayuda! Llame a una ambulancia.','Help! Call an ambulance.','In Spain and across the EU, the emergency number is 112.'],
+  ['When you\'re lost','Perdone, me he perdido. ¿Me puede ayudar?','Excuse me, I\'m lost. Can you help me?','"Perdone" is the polite way to stop a stranger.'],
+  ['When you don\'t understand','No entiendo. ¿Puede repetir, por favor?','I don\'t understand. Can you repeat that, please?','Add "más despacio" (more slowly) if they speak fast.'],
+  ['Asking for English','¿Habla inglés?','Do you speak English?','Try a few words of Spanish first. People appreciate the effort.'],
+  ['At the pharmacy','¿Tiene algo para el dolor de cabeza?','Do you have something for a headache?','Spanish pharmacies have a green cross sign and the staff give good advice.'],
+  ['Allergies','Soy alérgico a los frutos secos.','I\'m allergic to nuts.','Say "alérgica" if you\'re a woman.'],
+  ['Paying by card','¿Puedo pagar con tarjeta?','Can I pay by card?','Card is accepted almost everywhere, but small bars may prefer cash.'],
+  ['Getting the bill','¿Me cobra, por favor?','Can I pay, please?','In Spain the waiter won\'t bring the bill until you ask for it.'],
+  ['At the station','Un billete de ida y vuelta a Madrid, por favor.','A return ticket to Madrid, please.','"Solo ida" means one way.'],
+  ['Opening hours','¿A qué hora abre la tienda?','What time does the shop open?','Many small shops in Spain close for a few hours in the afternoon.'],
+  ['Seeing a doctor','Necesito un médico. Me duele aquí.','I need a doctor. It hurts here.','Point to where it hurts while you say "aquí".'],
+  ['Writing it down','¿Me lo puede escribir, por favor?','Can you write it down for me, please?','Handy for addresses, prices and names.'],
+  ['At the hotel','La ducha no funciona.','The shower doesn\'t work.','Swap in anything: "El aire acondicionado no funciona".'],
+  ['Booking a table','Quería reservar una mesa para cuatro a las nueve.','I\'d like to book a table for four at nine.','"Quería" (I wanted) is a soft, polite way to ask.'],
+  ['Asking the way','¿Cómo llego a la estación?','How do I get to the station?','"¿Cómo llego a…?" works for anywhere.'],
+  ['Taxi','Lléveme a esta dirección, por favor.','Take me to this address, please.','Show the address on your phone as you say it.'],
+  ['Shopping','¿Tiene esto en otra talla?','Do you have this in another size?','"Más grande" is bigger, "más pequeña" is smaller.'],
+  ['Wi-Fi','¿Cuál es la contraseña del wifi?','What\'s the Wi-Fi password?','Spaniards say "wifi" like "wee-fee".'],
+  ['Saying sorry','Lo siento, ha sido sin querer.','Sorry, I didn\'t mean to.','"Perdón" is for small bumps; "lo siento" is a real apology.'],
+  ['Making friends','¿Te apetece tomar algo?','Do you fancy getting a drink?','"Tomar algo" is the classic casual invitation.']
+];
+/* Sayings and quotes: [spanish, literal English, meaning, source or null]. */
+const DICHOS = [
+  ['Poco a poco se va lejos.','Little by little, you go far.','Slow, steady progress gets you there.', null],
+  ['Caminante, no hay camino, se hace camino al andar.','Traveller, there is no road; the road is made by walking.','You make your own path by moving forward.','Antonio Machado'],
+  ['El que lee mucho y anda mucho, ve mucho y sabe mucho.','The one who reads much and walks much, sees much and knows much.','Reading and travel make you wise.','Miguel de Cervantes, Don Quijote'],
+  ['Más vale tarde que nunca.','Better late than never.','The same as the English saying.', null],
+  ['En boca cerrada no entran moscas.','Flies don\'t get into a closed mouth.','Sometimes it\'s wiser to stay quiet.', null],
+  ['No hay mal que por bien no venga.','There\'s no bad that doesn\'t come with some good.','Every cloud has a silver lining.', null],
+  ['Dime con quién andas y te diré quién eres.','Tell me who you walk with and I\'ll tell you who you are.','You\'re judged by the company you keep.', null],
+  ['A quien madruga, Dios le ayuda.','God helps whoever gets up early.','The early bird catches the worm.', null],
+  ['Más vale pájaro en mano que ciento volando.','A bird in the hand is worth more than a hundred flying.','Value what you already have.', null],
+  ['Camarón que se duerme, se lo lleva la corriente.','The shrimp that falls asleep gets swept away by the current.','Stay alert or you\'ll miss out.', null],
+  ['Ojos que no ven, corazón que no siente.','Eyes that don\'t see, heart that doesn\'t feel.','What you don\'t know can\'t hurt you.', null],
+  ['El que no arriesga, no gana.','Whoever doesn\'t risk doesn\'t win.','Nothing ventured, nothing gained.', null],
+  ['Ser pan comido.','To be eaten bread.','To be a piece of cake: very easy.', null],
+  ['Estar en las nubes.','To be in the clouds.','To be daydreaming.', null],
+  ['Tomar el pelo.','To take someone\'s hair.','To pull someone\'s leg.', null],
+  ['Costar un ojo de la cara.','To cost an eye from your face.','To cost an arm and a leg.', null],
+  ['Echar una mano.','To throw a hand.','To lend a hand.', null],
+  ['Al mal tiempo, buena cara.','To bad weather, a good face.','Keep smiling when things go wrong.', null]
+];
 
 </script>
 <script>
@@ -907,9 +1158,41 @@ function audioBtns(text){
     h('button', { class:'icon-btn', type:'button', 'aria-label':'Play slowly', html:ICON.slow, onclick:() => say(text, true) }));
 }
 function toast(msg){ const t = $('#toast'); t.textContent = msg; t.hidden = false; clearTimeout(toast.tm); toast.tm = setTimeout(() => t.hidden = true, 2600); }
-function show(id){ ['home','lesson','done'].forEach(s => $('#'+s).hidden = s !== id); window.scrollTo(0,0); }
+function show(id){ ['home','lesson','done'].forEach(s => $('#'+s).hidden = s !== id); $('#nav').hidden = id !== 'home'; document.body.classList.toggle('in-lesson', id !== 'home'); window.scrollTo(0,0); }
 
-/* ---------- home ---------- */
+/* ---------- home: tabs ---------- */
+const MARK = '<svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="15" fill="currentColor"/><path d="M8 25c3-1 4-5 8-6s6-4 8-12" fill="none" stroke="var(--bg)" stroke-width="3.2" stroke-linecap="round"/><path d="M8 25c3-1 4-5 8-6s6-4 8-12" fill="none" stroke="currentColor" stroke-width="1" stroke-dasharray="2 2.5" stroke-linecap="round"/><circle cx="24" cy="7.5" r="2.4" fill="var(--bg)"/></svg>';
+let TAB = 'learn';
+const TABS = [
+  ['learn','Learn','<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19c3-1 4-5 8-5s4 3 8 1M4 19V5m16 10V5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="9" r="2.5" fill="currentColor"/></svg>'],
+  ['practice','Practise','<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12a8 8 0 0 1 14-5.3M20 12a8 8 0 0 1-14 5.3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M18 3v4h-4M6 21v-4h4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>'],
+  ['scroll','Scroll','<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="3" width="14" height="8" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><rect x="5" y="14" width="14" height="7" rx="2" fill="none" stroke="currentColor" stroke-width="2"/></svg>'],
+  ['listen','Listen','<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 15v-3a8 8 0 0 1 16 0v3" fill="none" stroke="currentColor" stroke-width="2"/><rect x="3" y="14" width="5" height="7" rx="2" fill="currentColor"/><rect x="16" y="14" width="5" height="7" rx="2" fill="currentColor"/></svg>'],
+  ['me','Me','<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>']
+];
+function setTab(t){ if (t !== 'listen') stopListen(); TAB = t; renderHome(); window.scrollTo(0,0); }
+function renderNav(){
+  const nav = $('#nav'); nav.innerHTML = '';
+  nav.append(h('div', { class:'nav-in' }, TABS.map(([id, label, svg]) =>
+    h('button', { class:'nav-b'+(TAB === id ? ' on' : ''), type:'button', 'aria-current': TAB === id ? 'page' : false, onclick:() => setTab(id) },
+      h('span', { class:'nav-i', html:svg }), h('span', {}, label)))));
+}
+function userLevel(){ return Math.floor(Math.sqrt(S.xp / 15)) + 1; }
+function levelSpan(){ const L = userLevel(), a = 15*(L-1)*(L-1), b = 15*L*L; return { L, pct: Math.round((S.xp - a) / (b - a) * 100), need: b - S.xp }; }
+function topBar(title, tag){
+  return h('header', { class:'top' },
+    h('div', { class:'brand' }, h('span', { class:'mark', 'aria-hidden':'true', html:MARK }), h('span', { class:'brand-name' }, 'Ruta'), tag ? h('span', { class:'tag' }, tag) : null),
+    h('div', { class:'pills' },
+      h('span', { class:'pill streak', title:'Day streak' }, h('span', { class:'flame', html:ICON.flame }), String(streakNow())),
+      h('span', { class:'pill lv', title:'Level' }, 'Lv ' + userLevel())));
+}
+function renderHome(){
+  const home = $('#home'); home.innerHTML = '';
+  ({ learn:renderLearn, practice:renderPractice, scroll:renderScroll, listen:renderListen, me:renderMe })[TAB](home);
+  renderNav();
+}
+
+/* progress helpers */
 function bandPct(band){
   const us = COURSE.map((u,i) => [u,i]).filter(([u]) => u.band === band);
   const done = us.reduce((n,[u,i]) => n + lvl(i), 0);
@@ -929,37 +1212,105 @@ function currentUnit(){
   for (let i=0;i<COURSE.length;i++) if (unlocked(i) && lvl(i) < 3) return i;
   return -1;
 }
-function renderHome(){
-  const home = $('#home'); home.innerHTML = '';
-  const goal = S.settings.goal, tx = todayXP(), due = dueItems().length, weak = weakItems().length, cur = currentUnit();
-  home.append(
-    h('header', { class:'top' },
-      h('div', { class:'brand' }, h('span', { class:'mark', 'aria-hidden':'true' }),
-        h('div', {}, h('h1', {}, 'Ruta'), h('p', { class:'sub' }, 'Spanish, one step at a time'))),
-      h('button', { class:'icon-btn', type:'button', 'aria-label':'Settings', html:ICON.gear, onclick:openSettings })),
-    h('section', { class:'stats', 'aria-label':'Your progress' },
-      h('div', { class:'stat' }, h('span', { class:'stat-k' }, 'Streak'),
-        h('span', { class:'stat-v streak' }, h('span', { class:'flame', html:ICON.flame }), String(streakNow()), h('small', {}, streakNow() === 1 ? ' day' : ' days'))),
-      h('div', { class:'stat' }, h('span', { class:'stat-k' }, 'Today'),
-        h('span', { class:'stat-v' }, String(tx), h('small', {}, ' / '+goal+' XP')),
-        h('span', { class:'meter', role:'progressbar', 'aria-valuemin':'0', 'aria-valuemax':String(goal), 'aria-valuenow':String(Math.min(tx,goal)) },
-          h('span', { style:'width:'+Math.min(100, Math.round(tx/goal*100))+'%' }))),
-      h('div', { class:'stat' }, h('span', { class:'stat-k' }, 'Words known'), h('span', { class:'stat-v' }, String(learnedWords()), h('small', {}, ' / '+ALL.filter(i=>i.kind==='w').length)))),
-    (() => { const bands = [...new Set(COURSE.map(u => u.band))];
-      const act = cur >= 0 ? COURSE[cur].band : bands[bands.length-1];
-      const total = Math.round(COURSE.reduce((n,u,i) => n + lvl(i), 0) / (COURSE.length * 3) * 100);
-      return h('section', { class:'levels', 'aria-label':'Course progress' },
-        h('div', { class:'levels-head' }, h('h2', {}, 'Your Spanish level'), h('span', { class:'levels-total' }, total + '% of the course')),
-        bands.map(b => bandRow(b, b === act)),
-        h('p', { class:'small' }, 'Each unit has 3 levels. Finish every level in a band to reach 100%.')); })(),
-    h('section', { class:'practice', 'aria-label':'Practice' },
-      h('button', { class:'btn '+(due ? 'primary' : 'ghost'), type:'button', disabled: !due, onclick:() => startSession('review') },
-        due ? 'Review '+due+' due' : 'Nothing due to review'),
-      h('button', { class:'btn ghost', type:'button', disabled: !weak, onclick:() => startSession('mistakes') }, weak ? 'Fix mistakes ('+weak+')' : 'No weak spots'),
-      h('button', { class:'btn ghost', type:'button', onclick:() => startSession('verbs') }, 'Verb drill'))
-  );
-  let band = '';
-  let list = null;
+const BAND_LIST = [...new Set(COURSE.map(u => u.band))];
+
+/* the route map */
+function routeMap(){
+  const NS = 'http://www.w3.org/2000/svg';
+  const el = (t, a) => { const e = document.createElementNS(NS, t); for (const k in a) e.setAttribute(k, a[k]); return e; };
+  const svg = el('svg', { viewBox:'0 0 360 150', class:'route', role:'img', 'aria-label':'Your route from Beginner to Intermediate' });
+  const D = 'M18 118 C 70 120, 70 60, 120 62 S 190 112, 238 88 S 300 26, 342 34';
+  const base = el('path', { d:D, class:'road' }), dash = el('path', { d:D, class:'road-mid' }), done = el('path', { d:D, class:'road-done' });
+  svg.append(base, dash, done);
+  const wrap = h('div', { class:'route-wrap' }); wrap.append(svg);
+  requestAnimationFrame(() => {
+    const L = base.getTotalLength(); if (!L) return;
+    const fr = BAND_LIST.reduce((n,b) => n + bandPct(b), 0) / (BAND_LIST.length * 100);
+    done.style.strokeDasharray = L; done.style.strokeDashoffset = L;
+    requestAnimationFrame(() => { done.style.strokeDashoffset = L * (1 - fr); });
+    const start = base.getPointAtLength(0);
+    svg.append(el('circle', { cx:start.x, cy:start.y, r:4, class:'stop-start' }));
+    const t0 = el('text', { x:start.x, y:start.y + 22, class:'stop-l', 'text-anchor':'start' }); t0.textContent = '¡Hola!'; svg.append(t0);
+    BAND_LIST.forEach((b, i) => {
+      const p = base.getPointAtLength(L * (i+1) / BAND_LIST.length), full = bandPct(b) === 100;
+      svg.append(el('circle', { cx:p.x, cy:p.y, r:9, class:'stop'+(full ? ' full' : '') }));
+      const code = el('text', { x:p.x, y:p.y + 3.5, class:'stop-c', 'text-anchor':'middle' }); code.textContent = b; svg.append(code);
+      const below = i === 1 ? p.y + 26 : p.y - 16;
+      const lab = el('text', { x: i === BAND_LIST.length-1 ? p.x + 8 : p.x, y:below, class:'stop-l', 'text-anchor': i === BAND_LIST.length-1 ? 'end' : 'middle' });
+      lab.textContent = BANDS[b] + ' ' + bandPct(b) + '%'; svg.append(lab);
+    });
+    const me = base.getPointAtLength(Math.max(0.001, L * fr));
+    svg.append(el('circle', { cx:me.x, cy:me.y, r:12, class:'me-glow' }), el('circle', { cx:me.x, cy:me.y, r:6, class:'me' }));
+  });
+  return wrap;
+}
+
+/* DAILY FIVE */
+const DAILY = [
+  ['lesson','Lesson','aprender','c-learn','<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6l8-3 8 3-8 3zM7 8v5c3 2 7 2 10 0V8" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>'],
+  ['word','Word','palabra','c-remember','<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 19l5-14h4l5 14M8 13h8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>'],
+  ['life','Real life','práctico','c-practical','<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7-6-7-11a7 7 0 0 1 14 0c0 5-7 11-7 11z" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="10" r="2.5" fill="currentColor"/></svg>'],
+  ['saying','Saying','refrán','c-expression','<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 18v-5a5 5 0 0 1 5-5M14 18v-5a5 5 0 0 1 5-5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>'],
+  ['brain','Brain','mente','c-think','<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 3L5 14h6l-1 7 8-11h-6z" fill="currentColor"/></svg>']
+];
+const dayNum = () => Math.floor((Date.now() - new Date().getTimezoneOffset()*6e4) / DAY);
+function daily(){ if (!S.daily || S.daily.d !== dstr()) S.daily = { d:dstr(), done:{} }; return S.daily; }
+function markDaily(k){
+  const d = daily(); if (d.done[k]) return false;
+  d.done[k] = true; addXP(2); bumpStreak();
+  if (DAILY.every(([id]) => d.done[id])){ addXP(5); toast('All five done today. +5 bonus XP. ¡Enhorabuena!'); }
+  save(); return true;
+}
+function gotIt(k){ return h('button', { class:'btn primary wide', type:'button', onclick:() => { const n = markDaily(k); closeSheet(); renderHome();
+  if (n && !DAILY.every(([id]) => daily().done[id])) toast('+2 XP · ' + DAILY.filter(([id]) => daily().done[id]).length + ' of 5 done today'); } }, daily().done[k] ? 'Close' : 'Got it'); }
+function openDaily(k){
+  pickVoice();
+  const n = dayNum();
+  const row = (es, big) => h('div', { class:'sc-row' }, h('p', { class: big ? 'sc-es' : 'sc-ex', lang:'es' }, glossify(es)), audioBtns(es));
+  if (k === 'lesson'){ const cur = currentUnit(); if (cur >= 0) startSession('lesson', cur, Math.min(3, lvl(cur)+1)); else startSession('review'); return; }
+  if (k === 'brain'){ startSession('quick'); return; }
+  if (k === 'word'){ const [w, en, ex, exEn] = WORD_DAY[n % WORD_DAY.length]; setTimeout(() => say(w), 200);
+    openSheet('Word of the day', [h('p', { class:'kicker c-remember' }, 'Palabra del día', h('i', {}, ' · ' + new Date().toLocaleDateString(undefined, { weekday:'long', day:'numeric', month:'long' }))),
+      row(w, true), h('p', { class:'sc-en' }, en), h('div', { class:'card' }, row(ex), h('p', { class:'small' }, exEn)), gotIt('word')]); }
+  if (k === 'life'){ const [sit, es, en, tip] = PRACTICAL[n % PRACTICAL.length]; setTimeout(() => say(es), 200);
+    openSheet('Real-life Spanish', [h('p', { class:'kicker c-practical' }, sit), row(es, true), h('p', { class:'sc-en' }, en),
+      h('p', { class:'small' }, tip), gotIt('life')]); }
+  if (k === 'saying'){ const [es, lit, mean, src] = DICHOS[n % DICHOS.length]; setTimeout(() => say(es), 200);
+    openSheet(src ? 'Quote of the day' : 'Saying of the day', [h('p', { class:'kicker c-expression' }, src ? 'Cita' : 'Refrán', h('i', {}, src ? ' · ' + src : ' · saying')),
+      row(es, true), h('p', { class:'sc-en' }, '"' + lit + '"'), h('p', { class:'small' }, 'Meaning: ' + mean), gotIt('saying')]); }
+}
+function dailyCard(){
+  const d = daily(), n = DAILY.filter(([id]) => d.done[id]).length;
+  return h('section', { class:'card daily' },
+    h('div', { class:'levels-head' }, h('h2', {}, 'Today\'s five', h('i', { lang:'es' }, ' · hoy')), h('span', { class:'levels-total' }, n + ' of 5 done')),
+    h('div', { class:'five' }, DAILY.map(([id, label, es, cls, svg]) => h('button', { class:'d-btn ' + cls + (d.done[id] ? ' done' : ''), type:'button', onclick:() => openDaily(id),
+      'aria-label': label + (d.done[id] ? ', done' : '') },
+      h('span', { class:'d-ring', html: d.done[id] ? '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>' : svg }),
+      h('span', { class:'d-l' }, label), h('span', { class:'d-es', lang:'es' }, es)))));
+}
+
+/* LEARN */
+function renderLearn(home){
+  const cur = currentUnit(), due = dueItems().length, tx = todayXP(), goal = S.settings.goal;
+  const total = Math.round(COURSE.reduce((n,u,i) => n + lvl(i), 0) / (COURSE.length * 3) * 100);
+  const act = cur >= 0 ? COURSE[cur].band : BAND_LIST[BAND_LIST.length-1];
+  home.append(...[topBar(),
+    h('section', { class:'hero' },
+      h('p', { class:'eyebrow' }, 'Tu ruta', h('i', { lang:'es' }, ' · your route')),
+      h('h1', { class:'hero-t' }, cur >= 0 ? 'Next stop: ' : '¡Lo lograste!', cur >= 0 ? h('span', { lang:'es' }, COURSE[cur].es) : null),
+      routeMap(),
+      cur >= 0 ? h('button', { class:'btn primary wide', type:'button', onclick:() => startSession('lesson', cur, Math.min(3, lvl(cur)+1)) },
+        (lvl(cur) === 0 ? 'Start ' : LEVEL_NAMES[Math.min(3, lvl(cur)+1)] + ' ') + COURSE[cur].es) : null,
+      h('div', { class:'goal' }, h('span', {}, 'Today ', h('b', {}, tx + ' / ' + goal + ' XP')),
+        h('span', { class:'meter' }, h('span', { style:'width:'+Math.min(100, Math.round(tx/goal*100))+'%' })))),
+    dailyCard(),
+    h('section', { class:'card levels', 'aria-label':'Course progress' },
+      h('div', { class:'levels-head' }, h('h2', {}, 'Your Spanish level'), h('span', { class:'levels-total' }, total + '% of the course')),
+      BAND_LIST.map(b => bandRow(b, b === act))),
+    due ? h('button', { class:'card nudge c-remember', type:'button', onclick:() => startSession('review') },
+      h('span', { class:'kicker' }, 'Review', h('i', { lang:'es' }, ' · repasar')), h('span', { class:'nudge-t' }, due + (due === 1 ? ' card is' : ' cards are') + ' ready'),
+      h('span', { class:'small' }, 'A few minutes now locks them into long-term memory.')) : null].filter(Boolean));
+  let band = '', list = null;
   COURSE.forEach((u, i) => {
     if (u.band !== band){ band = u.band;
       home.append(h('h2', { class:'band' }, h('span', { class:'band-code' }, band), BANDS[band], h('span', { class:'band-pct' }, bandPct(band) + '%')));
@@ -967,31 +1318,272 @@ function renderHome(){
     const L = lvl(i), open = unlocked(i);
     const pips = h('span', { class:'pips', 'aria-label':'Level '+L+' of 3' }, [1,2,3].map(n => h('span', { class: n <= L ? 'on' : '' })));
     const actions = h('div', { class:'unit-actions' });
-    if (open){
-      const label = L === 0 ? 'Start' : L < 3 ? LEVEL_NAMES[L+1] : 'Practise';
-      actions.append(h('button', { class:'btn small '+(i === cur ? 'primary' : 'soft'), type:'button', onclick:() => startSession('lesson', i, Math.min(3, L+1)) }, label));
-    } else {
-      actions.append(h('button', { class:'btn small ghost', type:'button', onclick:() => startSession('test', i) }, 'Test out'));
-    }
+    if (open) actions.append(h('button', { class:'btn small '+(i === cur ? 'primary' : 'soft'), type:'button', onclick:() => startSession('lesson', i, Math.min(3, L+1)) },
+      L === 0 ? 'Start' : L < 3 ? LEVEL_NAMES[L+1] : 'Practise'));
+    else actions.append(h('button', { class:'btn small ghost', type:'button', onclick:() => startSession('test', i) }, 'Test out'));
     actions.append(h('button', { class:'btn small text', type:'button', onclick:() => openNotes(i) }, 'Notes'));
-    list.append(h('li', { class:'unit'+(open ? '' : ' locked')+(i === cur ? ' current' : '') },
-      h('span', { class:'unit-n', 'aria-hidden':'true' }, String(i+1)),
+    list.append(h('li', { class:'unit'+(open ? '' : ' locked')+(i === cur ? ' current' : '')+(L === 3 ? ' mastered' : '') },
+      h('span', { class:'unit-n', 'aria-hidden':'true' }, L === 3 ? '✓' : String(i+1)),
       h('div', { class:'unit-t' }, h('span', { class:'unit-es', lang:'es' }, u.es), h('span', { class:'unit-en' }, u.en), pips),
       actions));
   });
-  home.append(h('p', { class:'foot' }, 'Progress is saved in this browser. Use Settings to copy a backup code to another device.'));
+}
+
+/* PRACTISE */
+function keptItems(){ return (S.kept || []).map(k => ITEMS[k]).filter(Boolean); }
+function renderPractice(home){
+  const due = dueItems().length, weak = weakItems().length, kept = keptItems().length;
+  const tile = (cls, kicker, es, title, note, n, go) => h('button', { class:'card tile-card '+cls, type:'button', disabled: n === 0, onclick:go },
+    h('span', { class:'kicker' }, kicker, h('i', { lang:'es' }, ' · ' + es)), h('span', { class:'nudge-t' }, title), h('span', { class:'small' }, note));
+  home.append(topBar(),
+    h('section', { class:'page-head' }, h('p', { class:'eyebrow' }, 'Practise', h('i', { lang:'es' }, ' · practicar')), h('h1', { class:'hero-t' }, 'Keep it sharp')),
+    h('div', { class:'grid' },
+      tile('c-remember', 'Review', 'repasar', due ? due + ' ready to review' : 'All caught up', due ? 'Cards whose timer has run out. Do these first.' : 'Come back later. Cards return as they start to fade.', due, () => startSession('review')),
+      tile('c-test', 'Mistakes', 'errores', weak ? 'Fix ' + weak + ' weak spots' : 'No weak spots', 'Only the things you keep getting wrong.', weak, () => startSession('mistakes')),
+      tile('c-practical', 'Verbs', 'verbos', 'Verb drill', 'Conjugate the verbs you\'ve unlocked, person by person.', 1, () => startSession('verbs')),
+      tile('c-learn', 'Kept', 'guardados', kept ? 'Practise ' + kept + ' kept cards' : 'Nothing kept yet', 'Bookmark words and phrases in Scroll to practise them here.', kept, () => startSession('kept'))),
+    h('section', { class:'card' }, h('h2', { class:'card-h' }, 'Words known'),
+      h('p', { class:'big-num' }, String(learnedWords()), h('small', {}, ' of ' + ALL.filter(i => i.kind === 'w').length)),
+      h('p', { class:'small' }, 'A word counts as known once you\'ve got it right on two separate reviews.')));
+}
+
+/* SCROLL */
+const SC = { feed:[], filter:'all', bags:{}, seen:0 };
+const SC_TYPES = { word:['Word','palabra','c-learn'], phrase:['Phrase','frase','c-remember'], quiz:['Quiz','prueba','c-test'],
+  grammar:['Grammar','gramática','c-think'], culture:['Culture','cultura','c-expression'], friend:['False friend','falso amigo','c-practical'] };
+const SC_FILTERS = [['all','All'],['word','Words'],['phrase','Phrases'],['quiz','Quiz'],['grammar','Grammar'],['culture','Culture'],['friend','False friends']];
+function scPool(type){
+  const top = Math.min(COURSE.length - 1, maxU() + 1), inR = i => i.u <= top;
+  if (type === 'word') return ALL.filter(i => i.kind === 'w' && inR(i)).map(i => ({ type, item:i, id:i.key }));
+  if (type === 'phrase') return ALL.filter(i => (i.kind === 's' || i.kind === 'd') && inR(i)).map(i => ({ type, item:i, id:i.key }));
+  if (type === 'quiz') return ALL.filter(i => i.kind === 'w' && inR(i)).map(i => ({ type, item:i, id:'q|'+i.key }));
+  if (type === 'grammar') return COURSE.flatMap((u, ui) => ui > top ? [] : (u.tip.match(/<p>[\s\S]*?<\/p>/g) || []).map((p, j) => ({ type, unit:u, html:p, id:'g|'+u.id+'|'+j })));
+  if (type === 'culture') return CULTURE.map((c, j) => ({ type, title:c[0], html:c[1], id:'c|'+j }));
+  if (type === 'friend') return FALSE_FRIENDS.map((f, j) => ({ type, f, id:'f|'+j }));
+  return [];
+}
+function scDraw(type){
+  if (!SC.bags[type] || !SC.bags[type].length) SC.bags[type] = shuffle(scPool(type));
+  return SC.bags[type].pop();
+}
+function scNext(n){
+  const mix = ['word','phrase','quiz','word','grammar','phrase','culture','quiz','friend','word','phrase','culture'];
+  const out = [];
+  for (let k = 0; k < n; k++){
+    const t = SC.filter === 'all' ? mix[(SC.feed.length + k) % mix.length] : SC.filter;
+    const c = scDraw(t); if (c) out.push(c);
+  }
+  return out;
+}
+function scToday(){ if (!S.sc || S.sc.d !== dstr()) S.sc = { d:dstr(), n:0 }; return S.sc; }
+function isKept(id){ return (S.kept || []).includes(id) || (S.keptMisc || []).includes(id); }
+function toggleKeep(card, btn){
+  const it = card.item, id = it && card.type !== 'quiz' ? it.key : (it ? it.key : card.id);
+  const list = it ? (S.kept = S.kept || []) : (S.keptMisc = S.keptMisc || []);
+  const ix = list.indexOf(id);
+  if (ix >= 0){ list.splice(ix, 1); btn.setAttribute('aria-pressed','false'); toast('Removed from kept'); }
+  else { list.push(id); btn.setAttribute('aria-pressed','true');
+    if (it && !S.srs[it.key]) S.srs[it.key] = { b:0, d:Date.now(), r:0, w:0 };
+    toast(it ? 'Kept. It\'s now in your reviews.' : 'Kept'); }
+  save(); const k = $('#sc-kept'); if (k) k.textContent = String((S.kept || []).length + (S.keptMisc || []).length);
+}
+const BOOK = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12v18l-6-4-6 4z" fill="currentColor"/></svg>';
+function scCard(card){
+  const [label, es, cls] = SC_TYPES[card.type];
+  const keepId = card.item ? card.item.key : card.id;
+  const keep = h('button', { class:'keep', type:'button', 'aria-label':'Keep this card', 'aria-pressed': String(isKept(keepId)), html:BOOK });
+  keep.addEventListener('click', () => toggleKeep(card, keep));
+  const headRow = h('div', { class:'sc-head' }, h('span', { class:'kicker' }, label, h('i', { lang:'es' }, ' · ' + es)),
+    card.type !== 'quiz' ? keep : null);
+  const body = [];
+  if (card.type === 'word' || card.type === 'phrase'){
+    const it = card.item, u = COURSE[it.u], isNew = !unlocked(it.u);
+    body.push(h('div', { class:'sc-row' }, h('p', { class:'sc-es', lang:'es' }, glossify(it.es[0])), audioBtns(it.es[0])),
+      h('p', { class:'sc-en' }, it.en.slice(0, 2).join(' · ')),
+      h('p', { class:'sc-meta' }, (it.kind === 'd' ? it.who + ' · ' : '') + 'From ' + u.es + (isNew ? ' · coming up next' : '') + (it.hint ? ' · ' + it.hint : '')));
+  } else if (card.type === 'quiz'){
+    const it = card.item, opts = shuffle([it.en[0], ...distract(it, 'en', 2, ['w'])]);
+    let done = false;
+    const btns = opts.map(o => h('button', { class:'opt', type:'button' }, o));
+    const result = h('p', { class:'sc-meta', 'aria-live':'polite' });
+    btns.forEach((b, j) => b.addEventListener('click', () => { if (done) return; done = true;
+      const ok = it.en.includes(opts[j]); rec(it.key, ok); save(); sfx(ok); say(it.es[0]);
+      btns.forEach((x, k) => { x.disabled = true; if (it.en.includes(opts[k])) x.classList.add('right'); else if (k === j) x.classList.add('wrong'); });
+      result.textContent = ok ? '¡Correcto! Counted toward your reviews.' : 'Not quite. This one will come back in your reviews.'; }));
+    body.push(h('p', { class:'sc-q' }, 'What does ', h('b', { lang:'es' }, it.es[0]), ' mean?'), h('div', { class:'options' }, btns), result);
+  } else if (card.type === 'grammar'){
+    body.push(h('h3', { class:'sc-title' }, card.unit.en), h('div', { class:'sc-text', html:card.html }));
+  } else if (card.type === 'culture'){
+    body.push(h('h3', { class:'sc-title' }, card.title), h('div', { class:'sc-text', html:'<p>' + card.html + '</p>' }));
+  } else if (card.type === 'friend'){
+    const [w, looks, real, ex] = card.f;
+    const ans = h('div', { class:'sc-answer', hidden:true },
+      h('p', {}, h('b', { lang:'es' }, w), ' means ', h('b', {}, real), '.'),
+      h('div', { class:'sc-row' }, h('p', { class:'sc-ex', lang:'es' }, ex), audioBtns(ex)));
+    const reveal = h('button', { class:'reveal', type:'button' }, 'Show the answer ›');
+    reveal.addEventListener('click', () => { ans.hidden = false; reveal.hidden = true; say(w); });
+    body.push(h('h3', { class:'sc-title' }, h('span', { lang:'es' }, w), ' ≠ ', looks),
+      h('p', { class:'sc-q' }, 'It looks like "' + looks + '", but it isn\'t. What does it really mean?'), reveal, ans);
+  }
+  return h('article', { class:'card sc-card ' + cls }, headRow, ...body);
+}
+function renderScroll(home){
+  const t = scToday();
+  home.append(h('header', { class:'top' },
+      h('div', { class:'brand' }, h('span', { class:'mark', 'aria-hidden':'true', html:MARK }), h('span', { class:'brand-name' }, 'Ruta'), h('span', { class:'tag' }, 'Scroll')),
+      h('div', { class:'pills' }, h('span', { class:'pill' }, h('b', { id:'sc-today' }, String(t.n)), ' today'),
+        h('span', { class:'pill' }, h('b', { id:'sc-kept' }, String((S.kept || []).length + (S.keptMisc || []).length)), ' kept'))),
+    h('div', { class:'filters', role:'toolbar', 'aria-label':'Card types' }, SC_FILTERS.map(([id, label]) =>
+      h('button', { class:'chip'+(SC.filter === id ? ' on' : ''), type:'button', 'aria-pressed': String(SC.filter === id),
+        onclick:() => { SC.filter = id; SC.feed = []; renderHome(); } }, label))));
+  const feed = h('div', { class:'feed', id:'feed' });
+  if (!SC.feed.length){
+    feed.append(h('article', { class:'card sc-card c-learn intro-card' }, h('span', { class:'kicker' }, 'Welcome', h('i', { lang:'es' }, ' · bienvenido')),
+      h('h3', { class:'sc-title big' }, 'Scroll as long as you like.'),
+      h('p', { class:'sc-text' }, 'Small cards of real Spanish: words, phrases, quick quizzes, grammar tips, culture and false friends. Tap the bookmark to keep a card. Kept words and phrases go straight into your reviews.')));
+    SC.feed = scNext(10);
+  }
+  SC.feed.forEach(c => feed.append(scCard(c)));
+  const more = h('div', { class:'more', 'aria-hidden':'true' }, 'Loading more…');
+  home.append(feed, more);
+  let busy = false;
+  const io = new IntersectionObserver(es => { if (!es[0].isIntersecting || busy || TAB !== 'scroll') return; busy = true;
+    const add = scNext(8); SC.feed.push(...add); add.forEach(c => feed.append(scCard(c))); setTimeout(() => busy = false, 150); }, { rootMargin:'600px' });
+  io.observe(more);
+  const seen = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting && !e.target.dataset.seen){ e.target.dataset.seen = '1';
+    const s = scToday(); s.n++; const el = $('#sc-today'); if (el) el.textContent = String(s.n); save(); } }), { threshold:0.6 });
+  const watch = () => feed.querySelectorAll('.sc-card:not([data-w])').forEach(c => { c.dataset.w = '1'; seen.observe(c); });
+  watch(); new MutationObserver(watch).observe(feed, { childList:true });
+}
+
+/* LISTEN */
+const LS = { on:false, unit:null, mode:'both', list:[], i:0, tok:0 };
+let EN_VOICE = null;
+function pickEnVoice(){
+  if (!TTS) return; const vs = speechSynthesis.getVoices().filter(v => /^en/i.test(v.lang));
+  const sc = v => (MALE.test(v.name) || /\b(guy|ryan|william|christopher|eric|david|mark|james|george|thomas|liam|daniel)\b/i.test(v.name) ? 6 : 0) + (/natural|neural|online/i.test(v.name) ? 5 : 0) + (/en[-_](AU|GB)/i.test(v.lang) ? 1 : 0);
+  EN_VOICE = vs.sort((a,b) => sc(b) - sc(a))[0] || null;
+}
+function speakP(text, lang, rateMul){
+  return new Promise(res => {
+    if (!TTS) return res();
+    const u = new SpeechSynthesisUtterance(text);
+    if (lang === 'es'){ if (VOICE){ u.voice = VOICE; u.lang = VOICE.lang; } else u.lang = 'es-ES'; }
+    else { if (EN_VOICE){ u.voice = EN_VOICE; u.lang = EN_VOICE.lang; } else u.lang = 'en-AU'; }
+    u.rate = S.settings.rate * (rateMul || 1);
+    let done = false; const fin = () => { if (!done){ done = true; res(); } };
+    u.onend = fin; u.onerror = fin; setTimeout(fin, 4000 + text.length * 180);
+    speechSynthesis.speak(u);
+  });
+}
+const wait = ms => new Promise(r => setTimeout(r, ms));
+function listenList(key){
+  if (key === 'kept') return keptItems();
+  if (key === 'learned') return ALL.filter(i => (i.kind === 'w' || i.kind === 's') && box(i.key) >= 1);
+  const u = COURSE.find(x => x.id === key); return u ? UNIT_ITEMS[u.id].filter(i => i.kind !== 'v') : [];
+}
+let wakeLock = null;
+async function runListen(){
+  const tok = ++LS.tok;
+  try { if ('wakeLock' in navigator) wakeLock = await navigator.wakeLock.request('screen'); } catch(e){}
+  while (LS.on && tok === LS.tok && LS.i < LS.list.length){
+    paintListen();
+    const it = LS.list[LS.i];
+    await speakP(it.es[0], 'es'); if (tok !== LS.tok) return; await wait(1100);
+    if (LS.mode === 'both'){ await speakP(it.en[0], 'en'); if (tok !== LS.tok) return; await wait(900); }
+    await speakP(it.es[0], 'es', 0.8); if (tok !== LS.tok) return; await wait(1500);
+    if (tok !== LS.tok) return;
+    LS.i++;
+  }
+  if (tok === LS.tok && LS.i >= LS.list.length){ LS.on = false; LS.i = 0; paintListen(true); }
+}
+function stopListen(){ LS.on = false; LS.tok++; try { speechSynthesis.cancel(); } catch(e){} try { wakeLock && wakeLock.release(); } catch(e){} wakeLock = null; }
+function paintListen(finished){
+  const box2 = $('#ls-now'); if (!box2) return;
+  const it = LS.list[LS.i];
+  $('#ls-es').textContent = it ? it.es[0] : '—';
+  $('#ls-en').textContent = it ? it.en[0] : '';
+  $('#ls-count').textContent = LS.list.length ? (Math.min(LS.i + 1, LS.list.length) + ' / ' + LS.list.length) : '';
+  $('#ls-fill').style.width = (LS.list.length ? LS.i / LS.list.length * 100 : 0) + '%';
+  const pb = $('#ls-play'); pb.innerHTML = LS.on ? PAUSE : PLAYBIG; pb.setAttribute('aria-label', LS.on ? 'Pause' : 'Play');
+  if (finished) toast('Track finished. ¡Bien hecho!');
+}
+const PLAYBIG = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z" fill="currentColor"/></svg>';
+const PAUSE = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 5h4v14H7zM13 5h4v14h-4z" fill="currentColor"/></svg>';
+function voicesBySex(){
+  const es = TTS ? speechSynthesis.getVoices().filter(v => /^es/i.test(v.lang)).sort((a,b) => voiceScore(b) - voiceScore(a)) : [];
+  return { male: es.find(isMale) || null, female: es.find(v => !isMale(v)) || null };
+}
+function renderListen(home){
+  pickVoice(); pickEnVoice();
+  const opts = [['learned','Everything I\'ve learned'], ['kept','My kept cards'], ...COURSE.map((u, i) => [u.id, (i+1) + '. ' + u.es + ' (' + u.en + ')' + (unlocked(i) ? '' : ' · preview')])];
+  if (!LS.unit){ const cu = currentUnit(); LS.unit = COURSE[Math.max(0, cu)].id; }
+  LS.list = listenList(LS.unit); if (LS.i >= LS.list.length) LS.i = 0;
+  const sel = h('select', { id:'ls-unit' }, opts.map(([v, l]) => h('option', { value:v, selected: v === LS.unit }, l)));
+  sel.addEventListener('change', () => { stopListen(); LS.unit = sel.value; LS.i = 0; renderHome(); });
+  const mode = (m, l) => h('button', { class:'chip'+(LS.mode === m ? ' on' : ''), type:'button', 'aria-pressed': String(LS.mode === m), onclick:() => { LS.mode = m; renderHome(); } }, l);
+  const { male, female } = voicesBySex();
+  const narr = (v, label, key) => v ? h('div', { class:'narr'+(VOICE && VOICE.name === v.name ? ' on' : '') },
+    h('button', { class:'narr-pick', type:'button', onclick:() => { S.settings.voice = v.name; save(); pickVoice(); renderHome(); } },
+      h('span', { class:'narr-a', 'aria-hidden':'true' }, key), h('span', {}, h('b', {}, label), h('small', {}, v.name.replace(/^Microsoft /,'').replace(/ - Spanish.*$/,'').replace(/\s*\(.*\)/,'')))),
+    h('button', { class:'btn small soft', type:'button', onclick:() => { const keep = VOICE; VOICE = v; say('Hola, soy tu narrador.'); VOICE = keep; } }, '▶ Hear')) : null;
+  const play = h('button', { class:'big-play', id:'ls-play', type:'button', 'aria-label':'Play', html:PLAYBIG });
+  play.addEventListener('click', () => { if (!LS.list.length){ toast('Nothing to play here yet.'); return; }
+    if (LS.on) stopListen(); else { LS.on = true; runListen(); } paintListen(); });
+  const skip = d => { const was = LS.on; stopListen(); LS.i = Math.max(0, Math.min(LS.list.length - 1, LS.i + d)); paintListen(); if (was){ LS.on = true; runListen(); } };
+  home.append(topBar(null, 'Listen'),
+    h('section', { class:'page-head' }, h('p', { class:'eyebrow' }, 'Escuchar', h('i', {}, ' · listen')), h('h1', { class:'hero-t' }, 'Learn on the go'),
+      h('p', { class:'small' }, 'Hands-free lessons for the drive, the walk or the gym. Each line plays in Spanish, then English, then Spanish again, slower.')),
+    h('section', { class:'card player' },
+      h('label', { class:'lbl', for:'ls-unit' }, 'What to play'), sel,
+      h('div', { class:'chips' }, mode('both', 'Spanish + English'), mode('es', 'Spanish only')),
+      h('div', { class:'now', id:'ls-now', 'aria-live':'polite' },
+        h('p', { class:'ls-es', id:'ls-es', lang:'es' }), h('p', { class:'ls-en', id:'ls-en' })),
+      h('div', { class:'ls-track' }, h('span', { class:'meter' }, h('span', { id:'ls-fill' })), h('span', { class:'ls-count', id:'ls-count' })),
+      h('div', { class:'controls' },
+        h('button', { class:'icon-btn ctl', type:'button', 'aria-label':'Previous', html:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 5h2v14H6zM20 5v14L9 12z" fill="currentColor"/></svg>', onclick:() => skip(-1) }),
+        play,
+        h('button', { class:'icon-btn ctl', type:'button', 'aria-label':'Next', html:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 5h2v14h-2zM4 5v14l11-7z" fill="currentColor"/></svg>', onclick:() => skip(1) }))),
+    h('section', { class:'card' }, h('h2', { class:'card-h' }, 'Choose your narrator'),
+      (male || female) ? h('div', { class:'narrs' }, narr(male, 'Male', 'M'), narr(female, 'Female', 'F'))
+        : h('p', { class:'small' }, 'No Spanish voice found on this device. Try Microsoft Edge or your phone\'s browser.'),
+      !male ? h('p', { class:'small' }, 'No male Spanish voice in this browser. Microsoft Edge has a clear one called Álvaro.') : null,
+      h('p', { class:'small' }, 'Tip: keep this tab open while you drive. Your screen stays awake during playback where the browser allows it.')));
+  paintListen();
+}
+
+/* ME */
+function renderMe(home){
+  const { L, pct, need } = levelSpan();
+  const acc = S.stats.answers ? Math.round(S.stats.correct / S.stats.answers * 100) : 0;
+  const unitsDone = COURSE.filter((u, i) => lvl(i) === 3).length;
+  const stat = (k, v, sm) => h('div', { class:'stat' }, h('span', { class:'stat-k' }, k), h('span', { class:'stat-v' }, v, sm ? h('small', {}, sm) : null));
+  home.append(topBar(),
+    h('section', { class:'page-head' }, h('p', { class:'eyebrow' }, 'Tú', h('i', {}, ' · you')), h('h1', { class:'hero-t' }, 'Level ' + L)),
+    h('section', { class:'card' },
+      h('div', { class:'levels-head' }, h('h2', { class:'card-h' }, 'Next level'), h('span', { class:'levels-total' }, need + ' XP to go')),
+      h('span', { class:'lvl-bar' }, h('span', { style:'width:'+pct+'%' }))),
+    h('section', { class:'stats' },
+      stat('Streak', String(streakNow()), streakNow() === 1 ? ' day' : ' days'), stat('Total XP', String(S.xp)),
+      stat('Accuracy', acc + '%'), stat('Words known', String(learnedWords())),
+      stat('Units mastered', String(unitsDone), ' / ' + COURSE.length), stat('Answers', String(S.stats.answers))),
+    h('section', { class:'card settings' }, h('h2', { class:'card-h' }, 'Settings'), ...settingsNodes()),
+    h('p', { class:'foot' }, 'Ruta is free and private. Progress is saved in this browser only.'));
 }
 
 /* ---------- sessions ---------- */
 let Q = null, ctx = null, phase = 'answer';
 function startSession(mode, ui, level){
-  pickVoice();
+  stopListen(); pickVoice();
   let queue = [];
   if (mode === 'lesson') queue = buildLesson(ui, level, false);
   else if (mode === 'test') queue = buildLesson(ui, 3, true);
   else if (mode === 'review') queue = buildReview();
   else if (mode === 'mistakes') queue = buildMistakes();
   else if (mode === 'verbs') queue = buildVerbs();
+  else if (mode === 'kept') queue = buildFromItems(keptItems(), 15);
+  else if (mode === 'quick'){ let pool = ALL.filter(i => (i.kind === 'w' || i.kind === 's' || i.kind === 'v') && S.srs[i.key]);
+    if (pool.length < 8) pool = ALL.filter(i => (i.kind === 'w' || i.kind === 's') && unlocked(i.u)); queue = buildFromItems(pool, 8); }
   if (!queue.length){ toast('Nothing to practise here yet.'); return; }
   Q = { mode, ui, level, queue, i:0, total:0, right:0, missed:new Set(), t0:Date.now(), noSpeak:false };
   $('#quit').hidden = true;
@@ -1059,6 +1651,10 @@ function finish(){
   } else if (Q.mode === 'review') title = 'Review complete';
   else if (Q.mode === 'mistakes') title = 'Weak spots practised';
   else if (Q.mode === 'verbs') title = 'Verb drill complete';
+  else if (Q.mode === 'kept') title = 'Kept cards practised';
+  else if (Q.mode === 'quick') title = 'Brain workout done';
+  if (Q.mode === 'lesson' || (Q.mode === 'test' && Q.total - Q.right <= 2)) markDaily('lesson');
+  if (['review','mistakes','verbs','kept','quick'].includes(Q.mode)) markDaily('brain');
   addXP(xp); bumpStreak(); save();
   const secs = Math.round((Date.now() - Q.t0) / 1000);
   const missed = [...Q.missed].map(k => ITEMS[k]).filter(Boolean);
@@ -1240,14 +1836,14 @@ function glossify(text){
 }
 let tipFor = null;
 function showTip(el){
-  const t = $('#tip'); t.textContent = el.getAttribute('data-g'); t.hidden = false; tipFor = el;
+  const t = $('#wtip'); t.textContent = el.getAttribute('data-g'); t.hidden = false; tipFor = el;
   document.querySelectorAll('.w.on').forEach(x => x.classList.remove('on')); el.classList.add('on');
   const r = el.getBoundingClientRect(), tw = t.offsetWidth, th = t.offsetHeight, vw = document.documentElement.clientWidth;
   let top = r.top - th - 8; if (top < 8) top = r.bottom + 8;
   const left = Math.max(8, Math.min(vw - tw - 8, r.left + r.width/2 - tw/2));
   t.style.top = top + 'px'; t.style.left = left + 'px';
 }
-function hideTip(){ const t = document.getElementById('tip'); if (t) t.hidden = true; tipFor = null; document.querySelectorAll('.w.on').forEach(x => x.classList.remove('on')); }
+function hideTip(){ const t = document.getElementById('wtip'); if (t) t.hidden = true; tipFor = null; document.querySelectorAll('.w.on').forEach(x => x.classList.remove('on')); }
 function wireTips(){
   let touch = false;
   document.addEventListener('touchstart', () => { touch = true; }, { passive:true });
@@ -1285,7 +1881,8 @@ function openNotes(i){
   ].filter(Boolean));
 }
 function backupCode(){ return btoa(unescape(encodeURIComponent(JSON.stringify(S)))); }
-function openSettings(){
+function openSettings(){ openSheet('Settings', settingsNodes()); }
+function settingsNodes(){
   pickVoice();
   const rate = h('input', { id:'set-rate', type:'range', min:'0.6', max:'1.1', step:'0.05', value:String(S.settings.rate) });
   const rateOut = h('output', { for:'set-rate' }, Math.round(S.settings.rate*100) + '%');
@@ -1299,9 +1896,9 @@ function openSettings(){
   const restore = h('textarea', { id:'set-restore', rows:'3', placeholder:'Paste a backup code here' });
   const status = h('p', { class:'status', 'aria-live':'polite' });
   const confirmRow = h('div', { class:'confirm', hidden:true }, h('span', {}, 'This erases every unit, streak and review. Sure?'),
-    h('button', { class:'btn small danger', type:'button', onclick:() => { S = fresh(); save(); closeSheet(); renderHome(); toast('Progress reset.'); } }, 'Yes, reset'),
+    h('button', { class:'btn small danger', type:'button', onclick:() => { S = fresh(); save(); closeSheet(); SC.feed = []; renderHome(); toast('Progress reset.'); } }, 'Yes, reset'),
     h('button', { class:'btn small text', type:'button', onclick:() => confirmRow.hidden = true }, 'Cancel'));
-  openSheet('Settings', [
+  return [
     (() => { const all = TTS ? speechSynthesis.getVoices().filter(v => /^es/i.test(v.lang)).sort((a,b) => voiceScore(b) - voiceScore(a)) : [];
       const sel = h('select', { id:'set-voice' }, all.map(v => h('option', { value:v.name, selected: VOICE && v.name === VOICE.name },
         v.name.replace(/^Microsoft /,'').replace(/ - Spanish.*$/,'') + ' · ' + v.lang + (isMale(v) ? ' · male' : '') + (/natural|neural|online/i.test(v.name) ? ' · clearest' : ''))));
@@ -1330,13 +1927,13 @@ function openSettings(){
     status,
     h('h3', {}, 'Start over'),
     h('button', { class:'btn small danger-ghost', type:'button', onclick:() => confirmRow.hidden = false }, 'Reset all progress'), confirmRow
-  ]);
+  ];
 }
 
 /* ---------- boot ---------- */
 function boot(){
   load(); pickVoice();
-  if (TTS && 'onvoiceschanged' in speechSynthesis) speechSynthesis.onvoiceschanged = pickVoice;
+  if (TTS && 'onvoiceschanged' in speechSynthesis) speechSynthesis.onvoiceschanged = () => { pickVoice(); pickEnVoice(); if (TAB === 'listen' && !$('#home').hidden) renderHome(); };
   wireTips();
   $('#bar-btn').addEventListener('click', onBar);
   $('#sheet-close').addEventListener('click', closeSheet);

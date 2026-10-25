@@ -628,7 +628,7 @@ const TYPES = {
 
 /* ---------- state ---------- */
 function fresh(){ return { v:1, units:{}, srs:{}, xp:0, today:{d:'',xp:0}, streak:{n:0,last:''},
-  settings:{ rate:0.9, goal:30, speak:true, sfx:true }, stats:{ answers:0, correct:0 } }; }
+  settings:{ rate:0.85, voice:'', goal:30, speak:true, sfx:true }, stats:{ answers:0, correct:0 } }; }
 let S = fresh();
 function load(){ try { const r = localStorage.getItem(STORE); if (r) adopt(JSON.parse(r)); } catch(e){} }
 function adopt(o){ const f = fresh(); S = Object.assign(f, o); S.settings = Object.assign(fresh().settings, o.settings || {}); S.stats = Object.assign(fresh().stats, o.stats || {}); }
@@ -848,14 +848,26 @@ function buildVerbs(){
 const TTS = typeof window !== 'undefined' && 'speechSynthesis' in window;
 const SR = typeof window !== 'undefined' ? (window.SpeechRecognition || window.webkitSpeechRecognition) : null;
 let VOICE = null, micBlocked = false;
+const MALE = /\b(alvaro|álvaro|jorge|pablo|ra[uú]l|dar[ií]o|gonzalo|tom[aá]s|jos[eé]|arnau|gerardo|liberto|cecilio|andr[eé]s|juan|diego|carlos|enrique|luciano|mateo|alonso|sa[uú]l|teo|rodrigo|emilio|nicol[aá]s|lorenzo|alex|federico|mauricio|sergio|male|hombre)\b/i;
+const FEMALE = /\b(helena|laura|elvira|paloma|sabina|dalia|m[oó]nica|paulina|elena|luc[ií]a|conchita|pen[eé]lope|lupe|ximena|abril|irene|estrella|larissa|marisol|l[ií]a|ver[oó]nica|camila|valentina|catalina|beatriz|carlota|female|mujer)\b|google espa/i;
+const isMale = v => MALE.test(v.name) && !FEMALE.test(v.name);
+function voiceScore(v){
+  let s = 0;
+  if (isMale(v)) s += 10; else if (FEMALE.test(v.name)) s -= 2;
+  if (/natural|neural|online|premium|enhanced/i.test(v.name)) s += 6;
+  if (/^es[-_]ES/i.test(v.lang)) s += 2; else if (/^es[-_](MX|US|419)/i.test(v.lang)) s += 1;
+  return s;
+}
 function pickVoice(){
   if (!TTS) return; const vs = speechSynthesis.getVoices();
-  VOICE = vs.find(v => /^es[-_]ES/i.test(v.lang)) || vs.find(v => /^es[-_](MX|US|419)/i.test(v.lang)) || vs.find(v => /^es/i.test(v.lang)) || null;
+  const es = vs.filter(v => /^es/i.test(v.lang));
+  const chosen = S.settings.voice && es.find(v => v.name === S.settings.voice);
+  VOICE = chosen || es.slice().sort((a,b) => voiceScore(b) - voiceScore(a))[0] || null;
 }
 function say(text, slow){
   if (!TTS) return;
   try { speechSynthesis.cancel(); const u = new SpeechSynthesisUtterance(text);
-    u.lang = VOICE ? VOICE.lang : 'es-ES'; if (VOICE) u.voice = VOICE; u.rate = S.settings.rate * (slow ? 0.6 : 1);
+    u.lang = VOICE ? VOICE.lang : 'es-ES'; if (VOICE) u.voice = VOICE; u.rate = S.settings.rate * (slow ? 0.65 : 1); u.pitch = 1; u.volume = 1;
     speechSynthesis.speak(u); } catch(e){}
 }
 let actx = null;
@@ -1290,9 +1302,17 @@ function openSettings(){
     h('button', { class:'btn small danger', type:'button', onclick:() => { S = fresh(); save(); closeSheet(); renderHome(); toast('Progress reset.'); } }, 'Yes, reset'),
     h('button', { class:'btn small text', type:'button', onclick:() => confirmRow.hidden = true }, 'Cancel'));
   openSheet('Settings', [
+    (() => { const all = TTS ? speechSynthesis.getVoices().filter(v => /^es/i.test(v.lang)).sort((a,b) => voiceScore(b) - voiceScore(a)) : [];
+      const sel = h('select', { id:'set-voice' }, all.map(v => h('option', { value:v.name, selected: VOICE && v.name === VOICE.name },
+        v.name.replace(/^Microsoft /,'').replace(/ - Spanish.*$/,'') + ' · ' + v.lang + (isMale(v) ? ' · male' : '') + (/natural|neural|online/i.test(v.name) ? ' · clearest' : ''))));
+      sel.addEventListener('change', () => { S.settings.voice = sel.value; save(); pickVoice(); say('Hola, ¿qué tal? Vamos a aprender español.'); });
+      const anyMale = all.some(isMale);
+      return h('div', { class:'field' }, h('label', { for:'set-voice' }, 'Voice'),
+        all.length ? sel : h('p', { class:'small' }, 'No Spanish voice found on this device, so listening exercises are skipped.'),
+        h('p', { class:'small' }, anyMale ? 'Male voices are picked first. Voices marked "clearest" sound the most natural.'
+          : 'This browser has no male Spanish voice. Open Ruta in Microsoft Edge for the clear male voice Álvaro.')); })(),
     h('div', { class:'field' }, h('label', { for:'set-rate' }, 'Voice speed'), h('div', { class:'range' }, rate, rateOut),
-      h('button', { class:'btn small soft', type:'button', onclick:() => say('Hola, ¿qué tal? Vamos a aprender español.') }, 'Test voice'),
-      h('p', { class:'small' }, VOICE ? 'Using voice: ' + VOICE.name + ' (' + VOICE.lang + ')' : 'No Spanish voice found on this device, so listening exercises are skipped. Most phones and Chrome include one.')),
+      h('button', { class:'btn small soft', type:'button', onclick:() => say('Hola, ¿qué tal? Vamos a aprender español.') }, 'Test voice')),
     h('div', { class:'field' }, h('label', { for:'set-goal' }, 'Daily goal'), goal),
     tog('set-speak', 'speak', 'Speaking exercises', SR ? 'Uses your microphone in Chrome, Edge or Safari.' : 'Not supported in this browser.'),
     tog('set-sfx', 'sfx', 'Sound effects'),

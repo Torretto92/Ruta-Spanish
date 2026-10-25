@@ -251,7 +251,7 @@ const isMale = v => MALE.test(v.name) && !FEMALE.test(v.name);
 function voiceScore(v){
   let s = 0;
   if (isMale(v)) s += 10; else if (FEMALE.test(v.name)) s -= 2;
-  if (/natural|neural|online|premium|enhanced/i.test(v.name)) s += 6;
+  if (/natural|neural|online|premium|enhanced|mejorad|superior/i.test(v.name)) s += 6;
   if (/^es[-_]ES/i.test(v.lang)) s += 2; else if (/^es[-_](MX|US|419)/i.test(v.lang)) s += 1;
   return s;
 }
@@ -1047,7 +1047,7 @@ function settingsNodes(){
   return [
     (() => { const all = TTS ? speechSynthesis.getVoices().filter(v => /^es/i.test(v.lang)).sort((a,b) => voiceScore(b) - voiceScore(a)) : [];
       const sel = h('select', { id:'set-voice' }, all.map(v => h('option', { value:v.name, selected: VOICE && v.name === VOICE.name },
-        v.name.replace(/^Microsoft /,'').replace(/ - Spanish.*$/,'') + ' · ' + v.lang + (isMale(v) ? ' · male' : '') + (/natural|neural|online/i.test(v.name) ? ' · clearest' : ''))));
+        v.name.replace(/^Microsoft /,'').replace(/ - Spanish.*$/,'') + ' · ' + v.lang + (isMale(v) ? ' · male' : '') + (/natural|neural|online|premium|enhanced|mejorad|superior/i.test(v.name) ? ' · clearest' : ''))));
       sel.addEventListener('change', () => { S.settings.voice = sel.value; save(); pickVoice(); say('Hola, ¿qué tal? Vamos a aprender español.'); });
       const anyMale = all.some(isMale);
       return h('div', { class:'field' }, h('label', { for:'set-voice' }, 'Voice'),

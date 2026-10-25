@@ -1102,18 +1102,39 @@ let VOICE = null, micBlocked = false;
 const MALE = /\b(alvaro|álvaro|jorge|pablo|ra[uú]l|dar[ií]o|gonzalo|tom[aá]s|jos[eé]|arnau|gerardo|liberto|cecilio|andr[eé]s|juan|diego|carlos|enrique|luciano|mateo|alonso|sa[uú]l|teo|rodrigo|emilio|nicol[aá]s|lorenzo|alex|federico|mauricio|sergio|male|hombre)\b/i;
 const FEMALE = /\b(helena|laura|elvira|paloma|sabina|dalia|m[oó]nica|paulina|elena|luc[ií]a|conchita|pen[eé]lope|lupe|ximena|abril|irene|estrella|larissa|marisol|l[ií]a|ver[oó]nica|camila|valentina|catalina|beatriz|carlota|female|mujer)\b|google espa/i;
 const isMale = v => MALE.test(v.name) && !FEMALE.test(v.name);
+const vid = v => v.voiceURI || v.name;
+function vQuality(v){ const t = (v.voiceURI || '') + ' ' + v.name;
+  if (/premium/i.test(t)) return 3; if (/enhanced|mejorad|superior|natural|neural|online/i.test(t)) return 2; return 0; }
+const NOVELTY = /\b(eddy|flo|grandma|grandpa|reed|rocko|sandy|shelley|albert|bad news|bahh|bells|boing|bubbles|cellos|good news|jester|organ|superstar|trinoids|whisper|wobble|zarvox|fred|junior|kathy|ralph|abuel[oa])\b/i;
+const REGION = { ES:'Spain', MX:'Mexico', US:'US', AR:'Argentina', CO:'Colombia', CL:'Chile', '419':'Latin America' };
+function vLabel(v){
+  const nm = v.name.replace(/^Microsoft /,'').replace(/ - Spanish.*$/,'').replace(/\s*\((enhanced|premium|mejorad[ao]|superior)\)/i,'').replace(/ Online \(Natural\)/,'');
+  const rg = REGION[(v.lang.split(/[-_]/)[1] || '').toUpperCase()] || v.lang;
+  const q = vQuality(v);
+  return nm + ' · ' + rg + (q === 3 ? ' · Premium' : q === 2 ? (/natural|neural|online/i.test(v.name) ? ' · Natural' : ' · Enhanced') : '') + (isMale(v) ? ' · male' : '');
+}
+function esVoices(){
+  if (!TTS) return [];
+  const best = {};
+  speechSynthesis.getVoices().filter(v => /^es/i.test(v.lang) && !NOVELTY.test(v.name)).forEach(v => {
+    const k = v.name.replace(/\s*\(.*\)/,'').replace(/ Online.*$/,'').toLowerCase() + '|' + v.lang.toLowerCase();
+    if (!best[k] || vQuality(v) > vQuality(best[k])) best[k] = v;
+  });
+  return Object.values(best).sort((a,b) => voiceScore(b) - voiceScore(a));
+}
 function voiceScore(v){
   let s = 0;
   if (isMale(v)) s += 10; else if (FEMALE.test(v.name)) s -= 2;
-  if (/natural|neural|online|premium|enhanced/i.test(v.name)) s += 6;
+  s += vQuality(v) * 4;
   if (/^es[-_]ES/i.test(v.lang)) s += 2; else if (/^es[-_](MX|US|419)/i.test(v.lang)) s += 1;
   return s;
 }
 function pickVoice(){
   if (!TTS) return; const vs = speechSynthesis.getVoices();
   const es = vs.filter(v => /^es/i.test(v.lang));
-  const chosen = S.settings.voice && es.find(v => v.name === S.settings.voice);
-  VOICE = chosen || es.slice().sort((a,b) => voiceScore(b) - voiceScore(a))[0] || null;
+  const want = S.settings.voice;
+  const chosen = want && (es.find(v => vid(v) === want) || es.filter(v => v.name === want).sort((a,b) => vQuality(b) - vQuality(a))[0]);
+  VOICE = chosen || esVoices()[0] || null;
 }
 function say(text, slow){
   if (!TTS) return;
@@ -1511,7 +1532,7 @@ function paintListen(finished){
 const PLAYBIG = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z" fill="currentColor"/></svg>';
 const PAUSE = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 5h4v14H7zM13 5h4v14h-4z" fill="currentColor"/></svg>';
 function voicesBySex(){
-  const es = TTS ? speechSynthesis.getVoices().filter(v => /^es/i.test(v.lang)).sort((a,b) => voiceScore(b) - voiceScore(a)) : [];
+  const es = esVoices();
   return { male: es.find(isMale) || null, female: es.find(v => !isMale(v)) || null };
 }
 function renderListen(home){
@@ -1523,9 +1544,9 @@ function renderListen(home){
   sel.addEventListener('change', () => { stopListen(); LS.unit = sel.value; LS.i = 0; renderHome(); });
   const mode = (m, l) => h('button', { class:'chip'+(LS.mode === m ? ' on' : ''), type:'button', 'aria-pressed': String(LS.mode === m), onclick:() => { LS.mode = m; renderHome(); } }, l);
   const { male, female } = voicesBySex();
-  const narr = (v, label, key) => v ? h('div', { class:'narr'+(VOICE && VOICE.name === v.name ? ' on' : '') },
-    h('button', { class:'narr-pick', type:'button', onclick:() => { S.settings.voice = v.name; save(); pickVoice(); renderHome(); } },
-      h('span', { class:'narr-a', 'aria-hidden':'true' }, key), h('span', {}, h('b', {}, label), h('small', {}, v.name.replace(/^Microsoft /,'').replace(/ - Spanish.*$/,'').replace(/\s*\(.*\)/,'')))),
+  const narr = (v, label, key) => v ? h('div', { class:'narr'+(VOICE && vid(VOICE) === vid(v) ? ' on' : '') },
+    h('button', { class:'narr-pick', type:'button', onclick:() => { S.settings.voice = vid(v); save(); pickVoice(); renderHome(); } },
+      h('span', { class:'narr-a', 'aria-hidden':'true' }, key), h('span', {}, h('b', {}, label), h('small', {}, vLabel(v).replace(/ · male$/,'')))),
     h('button', { class:'btn small soft', type:'button', onclick:() => { const keep = VOICE; VOICE = v; say('Hola, soy tu narrador.'); VOICE = keep; } }, '▶ Hear')) : null;
   const play = h('button', { class:'big-play', id:'ls-play', type:'button', 'aria-label':'Play', html:PLAYBIG });
   play.addEventListener('click', () => { if (!LS.list.length){ toast('Nothing to play here yet.'); return; }
@@ -1899,14 +1920,13 @@ function settingsNodes(){
     h('button', { class:'btn small danger', type:'button', onclick:() => { S = fresh(); save(); closeSheet(); SC.feed = []; renderHome(); toast('Progress reset.'); } }, 'Yes, reset'),
     h('button', { class:'btn small text', type:'button', onclick:() => confirmRow.hidden = true }, 'Cancel'));
   return [
-    (() => { const all = TTS ? speechSynthesis.getVoices().filter(v => /^es/i.test(v.lang)).sort((a,b) => voiceScore(b) - voiceScore(a)) : [];
-      const sel = h('select', { id:'set-voice' }, all.map(v => h('option', { value:v.name, selected: VOICE && v.name === VOICE.name },
-        v.name.replace(/^Microsoft /,'').replace(/ - Spanish.*$/,'') + ' · ' + v.lang + (isMale(v) ? ' · male' : '') + (/natural|neural|online/i.test(v.name) ? ' · clearest' : ''))));
+    (() => { const all = esVoices();
+      const sel = h('select', { id:'set-voice' }, all.map(v => h('option', { value:vid(v), selected: VOICE && vid(v) === vid(VOICE) }, vLabel(v))));
       sel.addEventListener('change', () => { S.settings.voice = sel.value; save(); pickVoice(); say('Hola, ¿qué tal? Vamos a aprender español.'); });
       const anyMale = all.some(isMale);
       return h('div', { class:'field' }, h('label', { for:'set-voice' }, 'Voice'),
         all.length ? sel : h('p', { class:'small' }, 'No Spanish voice found on this device, so listening exercises are skipped.'),
-        h('p', { class:'small' }, anyMale ? 'Male voices are picked first. Voices marked "clearest" sound the most natural.'
+        h('p', { class:'small' }, anyMale ? 'Enhanced, Premium and Natural voices are the clearest. On iPhone, download them in Settings › Accessibility › Spoken Content › Voices › Spanish, then reopen Ruta.'
           : 'This browser has no male Spanish voice. Open Ruta in Microsoft Edge for the clear male voice Álvaro.')); })(),
     h('div', { class:'field' }, h('label', { for:'set-rate' }, 'Voice speed'), h('div', { class:'range' }, rate, rateOut),
       h('button', { class:'btn small soft', type:'button', onclick:() => say('Hola, ¿qué tal? Vamos a aprender español.') }, 'Test voice')),
@@ -1933,6 +1953,7 @@ function settingsNodes(){
 /* ---------- boot ---------- */
 function boot(){
   load(); pickVoice();
+  [300, 1000, 2500, 5000].forEach(t => setTimeout(() => { const before = VOICE && vid(VOICE); pickVoice(); pickEnVoice(); if ((VOICE && vid(VOICE)) !== before && !$('#home').hidden && (TAB === 'listen' || TAB === 'me')) renderHome(); }, t));
   if (TTS && 'onvoiceschanged' in speechSynthesis) speechSynthesis.onvoiceschanged = () => { pickVoice(); pickEnVoice(); if (TAB === 'listen' && !$('#home').hidden) renderHome(); };
   wireTips();
   $('#bar-btn').addEventListener('click', onBar);

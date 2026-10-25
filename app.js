@@ -65,6 +65,12 @@ COURSE.forEach((u, ui) => {
   list.forEach(it => ITEMS[it.key] = it); UNIT_ITEMS[u.id] = list;
 });
 const ALL = Object.values(ITEMS);
+const WG = {};
+ALL.filter(i => i.kind === 'w').forEach(i => {
+  const k = i.es[0].replace(/[¿¡?!.,;:]/g,'').toLowerCase().trim(), g = i.en[0];
+  if (!k.includes(' ')) { if (!GLOSS[k]) WG[k] = g; }
+  else { const m = k.match(/^(el|la|los|las) ([^ ]+)$/); if (m){ if (!GLOSS[m[2]]) WG[m[2]] = g.replace(/^the /,''); } else if (!PHRASES[k]) PHRASES[k] = g; }
+});
 
 const lvl = i => S.units[COURSE[i].id] || 0;
 const unlocked = i => i === 0 || lvl(i-1) >= 1 || lvl(i) >= 1;
@@ -158,7 +164,7 @@ function makeEx(type, item){
       for (const t of shuffle(pool)){ if (out.length >= 4) break; if (t.length < 2 || NAMES.has(t)) continue; if (out.some(o => deacc(o) === deacc(t))) continue; out.push(t); }
       const lead = (w.match(/^[¿¡]*/) || [''])[0], trail = (w.match(/[?!.,;:]*$/) || [''])[0];
       const pre = words.slice(0,i).join(' '), post = words.slice(i+1).join(' ');
-      return Object.assign(ex, { t:'fill', label:'Fill in the blank', pre:(pre ? pre+' ' : '')+lead, post:trail+(post ? ' '+post : ''),
+      return Object.assign(ex, { t:'fill', label:'Fill in the blank', preW:pre, postW:post, lead, trail,
         en:item.en[0], options:shuffle(out), answers:[ans], full:item.es[0] });
     }
     case 'type_w': case 'type_s': return Object.assign(ex, { t:'type', label:'Write this in Spanish', show:item.en[0], hint:item.hint, answers:item.es });
@@ -289,6 +295,20 @@ function toast(msg){ const t = $('#toast'); t.textContent = msg; t.hidden = fals
 function show(id){ ['home','lesson','done'].forEach(s => $('#'+s).hidden = s !== id); window.scrollTo(0,0); }
 
 /* ---------- home ---------- */
+function bandPct(band){
+  const us = COURSE.map((u,i) => [u,i]).filter(([u]) => u.band === band);
+  const done = us.reduce((n,[u,i]) => n + lvl(i), 0);
+  return Math.round(done / (us.length * 3) * 100);
+}
+function bandRow(band, active){
+  const pct = bandPct(band), n = COURSE.filter(u => u.band === band).length;
+  return h('div', { class:'lvl-row'+(active ? ' active' : '')+(pct === 100 ? ' full' : '') },
+    h('span', { class:'band-code' }, band),
+    h('span', { class:'lvl-name' }, BANDS[band], h('small', {}, n + ' units')),
+    h('span', { class:'lvl-bar', role:'progressbar', 'aria-label':BANDS[band]+' progress', 'aria-valuemin':'0', 'aria-valuemax':'100', 'aria-valuenow':String(pct) },
+      h('span', { style:'width:'+pct+'%' })),
+    h('span', { class:'lvl-pct' }, pct + '%'));
+}
 function currentUnit(){
   for (let i=0;i<COURSE.length;i++) if (unlocked(i) && lvl(i) < 1) return i;
   for (let i=0;i<COURSE.length;i++) if (unlocked(i) && lvl(i) < 3) return i;
@@ -310,6 +330,13 @@ function renderHome(){
         h('span', { class:'meter', role:'progressbar', 'aria-valuemin':'0', 'aria-valuemax':String(goal), 'aria-valuenow':String(Math.min(tx,goal)) },
           h('span', { style:'width:'+Math.min(100, Math.round(tx/goal*100))+'%' }))),
       h('div', { class:'stat' }, h('span', { class:'stat-k' }, 'Words known'), h('span', { class:'stat-v' }, String(learnedWords()), h('small', {}, ' / '+ALL.filter(i=>i.kind==='w').length)))),
+    (() => { const bands = [...new Set(COURSE.map(u => u.band))];
+      const act = cur >= 0 ? COURSE[cur].band : bands[bands.length-1];
+      const total = Math.round(COURSE.reduce((n,u,i) => n + lvl(i), 0) / (COURSE.length * 3) * 100);
+      return h('section', { class:'levels', 'aria-label':'Course progress' },
+        h('div', { class:'levels-head' }, h('h2', {}, 'Your Spanish level'), h('span', { class:'levels-total' }, total + '% of the course')),
+        bands.map(b => bandRow(b, b === act)),
+        h('p', { class:'small' }, 'Each unit has 3 levels. Finish every level in a band to reach 100%.')); })(),
     h('section', { class:'practice', 'aria-label':'Practice' },
       h('button', { class:'btn '+(due ? 'primary' : 'ghost'), type:'button', disabled: !due, onclick:() => startSession('review') },
         due ? 'Review '+due+' due' : 'Nothing due to review'),
@@ -320,7 +347,7 @@ function renderHome(){
   let list = null;
   COURSE.forEach((u, i) => {
     if (u.band !== band){ band = u.band;
-      home.append(h('h2', { class:'band' }, h('span', { class:'band-code' }, band), BANDS[band]));
+      home.append(h('h2', { class:'band' }, h('span', { class:'band-code' }, band), BANDS[band], h('span', { class:'band-pct' }, bandPct(band) + '%')));
       list = h('ol', { class:'path', start:String(i+1) }); home.append(list); }
     const L = lvl(i), open = unlocked(i);
     const pips = h('span', { class:'pips', 'aria-label':'Level '+L+' of 3' }, [1,2,3].map(n => h('span', { class: n <= L ? 'on' : '' })));
@@ -368,6 +395,7 @@ function nextEx(){
   while (Q.i < Q.queue.length && Q.queue[Q.i].t === 'speak' && !canDo('speak', Q)) Q.i++;
   if (Q.i >= Q.queue.length) return finish();
   progress();
+  hideTip();
   const ex = Q.queue[Q.i], stage = $('#stage'); stage.innerHTML = ''; ctx = null; phase = 'answer';
   const R = { intro:rIntro, mc:rMC, tiles:rTiles, type:rType, fill:rFill, match:rMatch, speak:rSpeak, dlg:rDlg }[ex.t];
   R(ex, stage);
@@ -405,7 +433,8 @@ function finish(){
   const xp = Q.right + (Q.mode === 'lesson' ? 5 : 3);
   let title = 'Session complete', note = '';
   if (Q.mode === 'lesson'){
-    const u = COURSE[Q.ui]; const before = lvl(Q.ui); S.units[u.id] = Math.max(before, Q.level);
+    const u = COURSE[Q.ui]; const before = lvl(Q.ui); const p0 = bandPct(u.band); S.units[u.id] = Math.max(before, Q.level); const p1 = bandPct(u.band);
+    if (p1 > p0) Q.bandUp = { band:u.band, p0, p1 };
     title = u.es + ': ' + LEVEL_NAMES[Q.level] + ' complete';
     if (before < 1 && Q.level === 1 && Q.ui + 1 < COURSE.length) note = 'Unit ' + (Q.ui + 2) + ', ' + COURSE[Q.ui+1].es + ', is now open.';
   } else if (Q.mode === 'test'){
@@ -422,6 +451,7 @@ function finish(){
   done.append(h('div', { class:'done-card' },
     h('p', { class:'eyebrow' }, todayXP() >= S.settings.goal ? 'Daily goal reached' : 'Nice work'),
     h('h2', {}, title), note ? h('p', { class:'done-note' }, note) : null,
+    Q.bandUp ? h('div', { class:'levels' }, bandRow(Q.bandUp.band, true), h('p', { class:'small' }, BANDS[Q.bandUp.band] + ' went from ' + Q.bandUp.p0 + '% to ' + Q.bandUp.p1 + '%.')) : null,
     h('dl', { class:'done-stats' },
       h('div', {}, h('dt', {}, 'XP earned'), h('dd', {}, '+'+xp)),
       h('div', {}, h('dt', {}, 'Accuracy'), h('dd', {}, acc+'%')),
@@ -444,8 +474,9 @@ function rIntro(ex, st){
 function promptBlock(ex){
   if (ex.listen){ setTimeout(() => say(ex.listen), 250); return h('div', { class:'listen' }, audioBtns(ex.listen)); }
   const lang = ex.audio ? 'es' : 'en';
-  return h('div', {}, h('div', { class:'big-row' }, h('span', { class:'big'+(ex.show.length > 28 ? ' long' : ''), lang }, ex.show), ex.audio ? audioBtns(ex.audio) : null),
-    ex.hint ? h('p', { class:'hint' }, ex.hint) : null);
+  return h('div', {}, h('div', { class:'big-row' }, h('span', { class:'big'+(ex.show.length > 28 ? ' long' : ''), lang }, ex.audio ? glossify(ex.show) : ex.show), ex.audio ? audioBtns(ex.audio) : null),
+    ex.hint ? h('p', { class:'hint' }, ex.hint) : null,
+    ex.audio && Q && ((Q.mode === 'lesson' && Q.level === 1) || S.stats.answers < 40) ? h('p', { class:'cue' }, 'Stuck? Hover over or tap a dotted word for a hint.') : null);
 }
 function rMC(ex, st){
   if (ex.audio) setTimeout(() => say(ex.audio), 250);
@@ -516,7 +547,7 @@ function rFill(ex, st){
     if (phase !== 'answer') return; chosen = o; blank.textContent = o; blank.classList.add('filled');
     btns.forEach(b => b.setAttribute('aria-pressed', String(b === e.currentTarget))); ctx.ready = true; syncBar(); } }, o));
   st.append(h('div', { class:'ex' }, head(ex),
-    h('p', { class:'fill-line', lang:'es' }, ex.pre, blank, ex.post),
+    h('p', { class:'fill-line', lang:'es' }, glossify(ex.preW), ex.preW ? ' ' : '', ex.lead, blank, ex.trail, ex.postW ? ' ' : '', glossify(ex.postW)),
     h('p', { class:'hint en' }, ex.en), h('div', { class:'chips' }, btns)));
   ctx = { ready:false, check:() => gradeExact(chosen, ex.answers), lock:(res) => { btns.forEach(b => b.disabled = true); blank.classList.add(res.ok ? 'right' : 'wrong'); if (res.ok) say(ex.full); } };
 }
@@ -561,7 +592,7 @@ function rSpeak(ex, st){
   } });
   function skip(msg){ Q.noSpeak = true; ctx.ready = true; resolve({ skip:true, msg }); }
   st.append(h('div', { class:'ex' }, head(ex),
-    h('div', { class:'big-row' }, h('span', { class:'big long', lang:'es' }, ex.show), audioBtns(ex.show)),
+    h('div', { class:'big-row' }, h('span', { class:'big long', lang:'es' }, glossify(ex.show)), audioBtns(ex.show)),
     h('p', { class:'hint en' }, ex.en), mic, out,
     h('button', { class:'btn text', type:'button', onclick:() => skip('Speaking is off for the rest of this session.') }, 'Can\'t talk right now')));
   ctx = { ready:false, best:[], check:() => {
@@ -570,6 +601,48 @@ function rSpeak(ex, st){
     for (const a of ctx.best){ const got = deacc(norm(a)).split(' '); const hit = want.filter(w => got.includes(w)).length; bestScore = Math.max(bestScore, hit / want.length); }
     return bestScore >= 0.75 ? { ok:true, note: bestScore < 1 ? 'Close enough. Listen once more to polish it.' : '' } : { ok:false, note:'Try to say every word. Tap play to hear it again.' };
   } };
+}
+
+/* ---------- word hints ---------- */
+function glossify(text){
+  const out = []; const words = String(text || '').split(/\s+/).filter(Boolean);
+  let i = 0;
+  while (i < words.length){
+    let n = 1, g = null;
+    for (let k = Math.min(4, words.length - i); k >= 2; k--){
+      const key = words.slice(i, i+k).map(w => clean(w).toLowerCase()).join(' ');
+      if (PHRASES[key]){ n = k; g = PHRASES[key]; break; }
+    }
+    if (!g){ const k = clean(words[i]).toLowerCase(); g = GLOSS[k] || WG[k] || null; }
+    const raw = words.slice(i, i+n).join(' ');
+    const lead = raw.match(/^[¿¡]*/)[0], trail = raw.match(/[?!.,;:]*$/)[0], core = raw.slice(lead.length, raw.length - trail.length);
+    if (lead) out.push(lead);
+    out.push(g && core ? h('span', { class:'w', tabindex:'0', 'data-g':g }, core) : core);
+    if (trail) out.push(trail);
+    i += n; if (i < words.length) out.push(' ');
+  }
+  return h('span', { class:'gl', lang:'es' }, out);
+}
+let tipFor = null;
+function showTip(el){
+  const t = $('#tip'); t.textContent = el.getAttribute('data-g'); t.hidden = false; tipFor = el;
+  document.querySelectorAll('.w.on').forEach(x => x.classList.remove('on')); el.classList.add('on');
+  const r = el.getBoundingClientRect(), tw = t.offsetWidth, th = t.offsetHeight, vw = document.documentElement.clientWidth;
+  let top = r.top - th - 8; if (top < 8) top = r.bottom + 8;
+  const left = Math.max(8, Math.min(vw - tw - 8, r.left + r.width/2 - tw/2));
+  t.style.top = top + 'px'; t.style.left = left + 'px';
+}
+function hideTip(){ const t = document.getElementById('tip'); if (t) t.hidden = true; tipFor = null; document.querySelectorAll('.w.on').forEach(x => x.classList.remove('on')); }
+function wireTips(){
+  let touch = false;
+  document.addEventListener('touchstart', () => { touch = true; }, { passive:true });
+  document.addEventListener('mouseover', e => { if (touch) return; const w = e.target.closest && e.target.closest('.w'); if (w) showTip(w); });
+  document.addEventListener('mouseout', e => { if (touch) return; const w = e.target.closest && e.target.closest('.w'); if (w && !w.contains(e.relatedTarget)) hideTip(); });
+  document.addEventListener('focusin', e => { if (e.target.classList && e.target.classList.contains('w')) showTip(e.target); });
+  document.addEventListener('focusout', e => { if (e.target.classList && e.target.classList.contains('w')) hideTip(); });
+  document.addEventListener('click', e => { const w = e.target.closest && e.target.closest('.w');
+    if (w){ showTip(w); say(w.textContent); } else hideTip(); });
+  window.addEventListener('scroll', hideTip, { passive:true });
 }
 
 /* ---------- notes & settings sheets ---------- */
@@ -641,6 +714,7 @@ function openSettings(){
 function boot(){
   load(); pickVoice();
   if (TTS && 'onvoiceschanged' in speechSynthesis) speechSynthesis.onvoiceschanged = pickVoice;
+  wireTips();
   $('#bar-btn').addEventListener('click', onBar);
   $('#sheet-close').addEventListener('click', closeSheet);
   $('#sheet').addEventListener('click', e => { if (e.target.id === 'sheet') closeSheet(); });

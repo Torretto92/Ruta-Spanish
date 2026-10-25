@@ -252,3 +252,55 @@ const COURSE = [
     'Recepcionista: Sí, de siete a diez. Aquí tiene la llave. = Yes, from seven to ten. Here is the key.',
     'Tom: Muchas gracias. = Thank you very much.'] }
 ];
+
+/* Word hints: hover or tap a Spanish word in an exercise to see these.
+   Single words go in GLOSS, multi-word phrases in PHRASES (longest phrase wins). */
+const PHRASES = {
+  'buenos días':'good morning', 'buenas tardes':'good afternoon', 'buenas noches':'good night / good evening',
+  'por favor':'please', 'de nada':'you\'re welcome', 'qué tal':'how\'s it going?', 'me llamo':'my name is (lit. I call myself)',
+  'te llamas':'your name is (lit. you call yourself)', 'se llama':'is called', 'mucho gusto':'nice to meet you',
+  'hasta luego':'see you later', 'muchas gracias':'thank you very much', 'todo recto':'straight ahead',
+  'a la derecha':'on the right', 'a la izquierda':'on the left', 'tengo hambre':'I\'m hungry (lit. I have hunger)',
+  'tengo que':'I have to', 'menú del día':'set menu of the day', 'todos los días':'every day', 'la semana pasada':'last week',
+  'la próxima semana':'next week', 'esta noche':'tonight', 'y media':'half past', 'me gusta':'I like (lit. it pleases me)',
+  'me gustan':'I like (plural things)', 'nos gustan':'we like (plural things)', 'te gusta':'you like', 'le encanta':'loves',
+  'a mí también':'me too', 'un poco':'a little', 'aquí tiene':'here you are', 'qué hora es':'what time is it?',
+  'cuántos años tienes':'how old are you? (lit. how many years do you have)', 'de dónde':'where from',
+  'a nombre de':'under the name of', 'en qué':'how / in what way', 'a qué hora':'at what time', 'algo más':'anything else',
+  'para mí':'for me', 'voy a':'I\'m going to', 'vas a':'you\'re going to', 'va a':'is going to', 'vamos a':'we\'re going to / let\'s'
+};
+const GLOSS = {
+  a:'to / at', abre:'opens', abuela:'grandmother', aeropuerto:'airport', agua:'water', ahora:'now', al:'to the', algo:'something',
+  'allí':'there', alto:'tall', amiga:'friend (female)', amigos:'friends', anoche:'last night', aprendo:'I learn', 'aquí':'here',
+  ayer:'yesterday', ayudarle:'help you (formal)', ayudarme:'help me', 'años':'years', bailar:'to dance', banco:'bank',
+  baratas:'cheap', 'baño':'bathroom', beber:'to drink', bebo:'I drink', bien:'well / good', bonita:'pretty', buenas:'good',
+  bueno:'good', buenos:'good', 'café':'coffee', cansada:'tired', carne:'meat', carta:'letter', casa:'house / home', centro:'centre',
+  cerca:'near', cinco:'five', ciudad:'city', coche:'car', cocina:'cooks', come:'eats', comer:'to eat', comida:'food', como:'I eat',
+  comprar:'to buy', 'compré':'I bought', 'comí':'I ate', cuenta:'bill', cuesta:'costs', 'cuánto':'how much', 'cuántos':'how many',
+  'cómo':'how', de:'of / from', del:'of the', deliciosa:'delicious', derecha:'right', desayuno:'breakfast', desean:'(you all) want',
+  'después':'afterwards', diez:'ten', doble:'double', dos:'two', 'día':'day', 'días':'days', 'dónde':'where', el:'the', ella:'she',
+  ellos:'they', en:'in / at / on', encanta:'delights (= loves)', encantada:'delighted', eres:'you are', es:'is', escribe:'writes',
+  escuchan:'listen', escuela:'school', 'españa':'Spain', 'español':'Spanish', esta:'this', estoy:'I am', estudia:'studies',
+  'está':'is', 'están':'are', favor:'favour', felices:'happy', fui:'I went / I was', 'fútbol':'football', gatos:'cats',
+  gracias:'thanks', grande:'big', gusta:'pleases (= like)', gustan:'please (= like)', gusto:'pleasure', 'habitación':'room',
+  hablas:'you speak', hablo:'I speak', hacer:'to do', hambre:'hunger', hasta:'until', hay:'there is / there are', hermana:'sister',
+  hermano:'brother', hermanos:'brothers / siblings', hiciste:'you did', hija:'daughter', hola:'hello', hombre:'man', hora:'hour / time',
+  hotel:'hotel', hoy:'today', incluido:'included', 'inglés':'English', izquierda:'left', la:'the', las:'the', le:'to him / to her',
+  leemos:'we read', lejos:'far', libro:'book', libros:'books', llama:'calls', llamar:'to call', llamas:'you call', llamo:'I call',
+  llave:'key', los:'the', luego:'later', lunes:'Monday', madre:'mother', maleta:'suitcase', manzana:'apple', manzanas:'apples',
+  'mañana':'tomorrow / morning', me:'me / myself', media:'half', 'menú':'menu', mesa:'table', mi:'my', mis:'my', muchas:'many',
+  mucho:'much / a lot', muy:'very', 'más':'more / else', 'mí':'me', 'música':'music', nada:'nothing', nadar:'to swim',
+  no:'no / not', noche:'night', noches:'nights / evening', nombre:'name', nos:'us', nueve:'nine', 'número':'number', padre:'father',
+  padres:'parents', paella:'paella (rice dish)', pan:'bread', para:'for', pasada:'last / past', 'película':'film / movie',
+  'pequeña':'small', 'perdí':'I lost', 'perdón':'excuse me', perfecto:'perfect', 'periódico':'newspaper', pescado:'fish',
+  playa:'beach', poco:'little', por:'for / by', profesora:'teacher (female)', 'próxima':'next', puedes:'you can', puedo:'I can',
+  que:'that', queremos:'we want', queso:'cheese', quieres:'you want', quiero:'I want', quisiera:'I would like', 'qué':'what',
+  recto:'straight', reserva:'reservation', sale:'leaves', salir:'to go out', se:'himself / herself', semana:'week',
+  'señora':'madam / Mrs', siete:'seven', siga:'carry on (polite)', 'simpática':'nice', 'simpático':'nice', somos:'we are',
+  son:'are', sopa:'soup', soy:'I am', su:'his / her / their', 'sábado':'Saturday', 'sí':'yes', tal:'such', 'también':'also / too',
+  tardes:'afternoons', te:'you / yourself', tengo:'I have', tienda:'shop', tiene:'has', tienes:'you have', todo:'all',
+  todos:'all / every', trabajamos:'we work', trabajar:'to work', trabajo:'I work', tren:'train', tres:'three', tu:'your',
+  'tú':'you', un:'a', una:'a / one', va:'goes', vamos:'we go / let\'s go', vas:'you go', veinte:'twenty', ver:'to see / to watch',
+  viajar:'to travel', viejo:'old', viernes:'Friday', vimos:'we saw', viven:'they live', vives:'you live', vivo:'I live',
+  'viví':'I lived', voy:'I go', y:'and', yo:'I', 'él':'he'
+};

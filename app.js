@@ -12,15 +12,27 @@ const BANDS = { A1:'Beginner', A2:'Elementary', B1:'Intermediate' };
 const PRAISE = ['¡Muy bien!','¡Correcto!','¡Perfecto!','¡Eso es!','¡Genial!'];
 const NAMES = new Set(['Ana','Carlos','Lucía','Madrid','México','Mexico','Australia','España','Spain','Chile','Tom','Smith','Marco','Sam','Elena','Spanish','English','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday','Mondays','I','I\'m','I\'d']);
 const LEVEL_NAMES = ['', 'Learn', 'Practise', 'Master'];
+/* Question mix per level. No typed answers anywhere: every question is tap-to-choose,
+   except "Say this out loud", which starts in the later Beginner units. */
+const SPEAK_FROM_UNIT = 5;   /* index 5 = Unit 6, Verbos en -ar */
 const LEVEL_TYPES = {
-  1: ['mc_es2en','pic','mc_en2es','pic','listen_mc','tiles_es2en','tiles_es2en','match','fill'],
-  2: ['pic','mc_en2es','tiles_en2es','tiles_es2en','type_w','type_w','fill','listen_w','conj','conj','dlg','match'],
-  3: ['type_w','type_s','type_s','listen_s','speak','conj','conj','tiles_en2es','dlg','fill','listen_w']
+  A1: {   /* Beginner: words only, learn → hear → choose */
+    1: ['mc_es2en','pic','mc_en2es','pic','listen_mc','match'],
+    2: ['listen_mc','mc_en2es','pic','match','mc_es2en','listen_mc','speak'],
+    3: ['listen_mc','mc_en2es','pic','mc_es2en','match','listen_mc','speak','speak']
+  },
+  rest: { /* Elementary and Intermediate */
+    1: ['mc_es2en','pic','mc_en2es','listen_mc','tiles_es2en','match','fill'],
+    2: ['pic','mc_en2es','tiles_en2es','tiles_es2en','fill','listen_mc','conj','conj','dlg','match','speak'],
+    3: ['tiles_en2es','tiles_en2es','listen_mc','speak','speak','conj','conj','dlg','fill','mc_en2es']
+  }
 };
+const isBeginner = ui => COURSE[ui] && COURSE[ui].band === 'A1';
+const speakOK = ui => ui >= SPEAK_FROM_UNIT;
 const TYPES = {
-  mc_es2en:{k:['w','s']}, pic:{k:['w']}, mc_en2es:{k:['w']}, listen_mc:{k:['w'],audio:1}, match:{k:['w']},
+  mc_es2en:{k:['w','s']}, pic:{k:['w']}, mc_en2es:{k:['w']}, listen_mc:{k:['w','s'],audio:1}, match:{k:['w']},
   tiles_es2en:{k:['s']}, tiles_en2es:{k:['s']}, fill:{k:['s']}, type_w:{k:['w']}, type_s:{k:['s']},
-  listen_w:{k:['w'],audio:1}, listen_s:{k:['s'],audio:1}, speak:{k:['s'],mic:1}, conj:{k:['v']}, dlg:{k:['d']}
+  listen_w:{k:['w'],audio:1}, listen_s:{k:['s'],audio:1}, speak:{k:['w','s'],mic:1}, conj:{k:['v']}, dlg:{k:['d']}
 };
 
 /* ---------- state ---------- */
@@ -148,7 +160,7 @@ function makeEx(type, item){
     case 'mc_en2es': return Object.assign(ex, { t:'mc', label:'Choose the Spanish', show:item.en[0], hint:item.hint,
       options:shuffle([item.es[0], ...distract(item,'es',3,[item.kind])]), answers:item.es, optAudio:true });
     case 'listen_mc': return Object.assign(ex, { t:'mc', label:'Tap what you hear', listen:item.es[0],
-      options:shuffle([item.es[0], ...distract(item,'es',3,['w'])]), answers:item.es, reveal:item.en[0] });
+      options:shuffle([item.es[0], ...distract(item,'es',3,[item.kind])]), answers:item.es, reveal:item.en[0] });
     case 'match': {
       const set = [item], ens = new Set(item.en.map(norm)), ess = new Set(item.es.map(norm));
       for (const o of shuffle(UNIT_ITEMS[u.id].filter(i => i.kind === 'w' && i.key !== item.key))){
@@ -184,7 +196,11 @@ function makeEx(type, item){
     case 'type_w': case 'type_s': return Object.assign(ex, { t:'type', label:'Write this in Spanish', show:item.en[0], hint:item.hint, answers:item.es });
     case 'listen_w': case 'listen_s': return Object.assign(ex, { t:'type', label:'Type what you hear', listen:item.es[0], answers:item.es, reveal:item.en[0] });
     case 'speak': return Object.assign(ex, { t:'speak', label:'Say this out loud', show:item.es[0], en:item.en[0], answers:item.es });
-    case 'conj': return Object.assign(ex, { t:'type', label:'Conjugate the verb', conj:item, answers:item.es });
+    case 'conj': {  /* multiple choice: pick the right form from the same verb and tense */
+      const forms = VERBS[item.verb + '|' + item.tense], right = forms[item.p];
+      const wrong = shuffle([...new Set(forms.filter(f => deacc(f) !== deacc(right) && f !== right))]).slice(0, 3);
+      return Object.assign(ex, { t:'mc', label:'Choose the right form', conj:item, optAudio:true, options:shuffle([right, ...wrong]), answers:[right] });
+    }
     case 'dlg': {
       const others = COURSE.filter(x => x.lines && x !== u).flatMap(x => x.lines.slice(1));
       const later = u.lines.filter((l,j) => j > item.li + 1);
@@ -206,7 +222,8 @@ function canDo(type, flags){
 function buildLesson(ui, level, test){
   const u = COURSE[ui], pool = UNIT_ITEMS[u.id];
   const n = test ? 12 : [0,12,14,15][level];
-  const types = LEVEL_TYPES[test ? 3 : level];
+  const beg = isBeginner(ui);
+  const types = LEVEL_TYPES[beg ? 'A1' : 'rest'][test ? 3 : level].filter(t => t !== 'speak' || speakOK(ui));
   const older = ALL.filter(i => i.u < ui && S.srs[i.key]);
   const used = {}, seen = new Set(), out = [];
   const forced = (!test && level === 1) ? ['mc_es2en','mc_en2es','mc_es2en'] : [];
@@ -215,8 +232,9 @@ function buildLesson(ui, level, test){
     const type = forced.length ? forced.shift() : pick(types);
     if (!canDo(type)) continue;
     const kinds = TYPES[type].k;
-    let cands = pool.filter(i => kinds.includes(i.kind) && (type !== 'pic' || hasArt(i)));
-    if (level >= 2 && !test && Math.random() < 0.2){ const rc = older.filter(i => kinds.includes(i.kind) && (type !== 'pic' || hasArt(i))); if (rc.length) cands = rc; }
+    const fits = i => kinds.includes(i.kind) && (type !== 'pic' || hasArt(i)) && (!beg || i.kind === 'w') && (beg || type !== 'speak' || i.kind === 's');
+    let cands = pool.filter(fits);
+    if (level >= 2 && !test && Math.random() < 0.2){ const rc = older.filter(fits); if (rc.length) cands = rc; }
     if (!cands.length) continue;
     const scored = cands.map(i => [i, (used[i.key]||0)*10 + (box(i.key) < 0 && !seen.has(i.key) ? -3 : Math.max(0,box(i.key))) + Math.random()*2.5]);
     scored.sort((a,b) => a[1]-b[1]);
@@ -232,8 +250,8 @@ function buildLesson(ui, level, test){
 function exForItem(item){
   const b = box(item.key);
   let opts;
-  if (item.kind === 'w') opts = b <= 2 ? ['mc_es2en','mc_en2es','listen_mc'].concat(hasArt(item) ? ['pic','pic'] : []) : ['type_w','listen_w','type_w'];
-  else if (item.kind === 's') opts = b <= 2 ? ['tiles_es2en','tiles_en2es','fill'] : ['type_s','listen_s','speak','tiles_en2es'];
+  if (item.kind === 'w') opts = ['mc_es2en','mc_en2es','listen_mc','match'].concat(hasArt(item) ? ['pic','pic'] : [], b > 2 && speakOK(item.u) ? ['speak'] : []);
+  else if (item.kind === 's') opts = b <= 2 ? ['tiles_es2en','tiles_en2es','fill','mc_es2en'] : ['tiles_en2es','listen_mc','fill'].concat(speakOK(item.u) ? ['speak'] : []);
   else if (item.kind === 'v') opts = ['conj'];
   else opts = ['dlg'];
   opts = opts.filter(t => canDo(t));
@@ -703,13 +721,10 @@ function topBar(title, tag){
     'aria-label': st + ' day streak', title: st + ' day streak',
     onclick:() => toast(st ? (alive ? st + '-day streak. You\'ve practised today. ¡Bien!' : st + '-day streak. Do a lesson today to keep it alive.') : 'Finish a lesson to start a streak.') },
     h('span', { class:'hud-ico flame-ico', html:FLAME_SVG }), h('b', {}, String(st)));
-  const gems = h('button', { class:'hud-item gems', type:'button', 'aria-label': gemsNow() + ' gems', title:'Gems',
-    onclick:() => toast('Gems: earn 5 per lesson, 10 for a perfect one, and more from Today\'s five.') },
-    h('span', { class:'hud-ico gem-ico', html:GEM_SVG }), h('b', {}, String(gemsNow())));
   return h('header', { class:'topnav' },
     h('div', { class:'brand' }, h('span', { class:'mark', 'aria-hidden':'true', html:MARK }), h('span', { class:'brand-name' }, 'Ruta'), tag ? h('span', { class:'tag' }, tag) : null),
     h('div', { class:'hud', role:'group', 'aria-label':'Your stats' },
-      streak, gems, h('span', { class:'hud-item lv', title:'Level' }, 'Lv ', h('b', {}, String(userLevel()))), themeBtn(), avatarEl()));
+      streak, h('span', { class:'hud-item lv', title:'Level' }, 'Lv ', h('b', {}, String(userLevel()))), themeBtn(), avatarEl()));
 }
 function watchStuck(){
   const set = () => { const t = document.querySelector('#home .topnav'); if (t) t.classList.toggle('stuck', window.scrollY > 4); };
@@ -786,8 +801,8 @@ const dayNum = () => Math.floor((Date.now() - new Date().getTimezoneOffset()*6e4
 function daily(){ if (!S.daily || S.daily.d !== dstr()) S.daily = { d:dstr(), done:{} }; return S.daily; }
 function markDaily(k){
   const d = daily(); if (d.done[k]) return false;
-  d.done[k] = true; addXP(2); addGems(2); bumpStreak();
-  if (DAILY.every(([id]) => d.done[id])){ addXP(5); addGems(10); toast('All five done today. +5 XP and +10 gems. ¡Enhorabuena!'); }
+  d.done[k] = true; addXP(2); bumpStreak();
+  if (DAILY.every(([id]) => d.done[id])){ addXP(5); toast('All five done today. +5 bonus XP. ¡Enhorabuena!'); }
   save(); return true;
 }
 function gotIt(k){ return h('button', { class:'btn primary wide', type:'button', onclick:() => { const n = markDaily(k); closeSheet(); renderHome();
@@ -1241,8 +1256,7 @@ function finish(){
   } else title = { review:'Review complete', mistakes:'Weak spots practised', verbs:'Verb drill complete', kept:'Kept cards practised', quick:'Brain workout done' }[Q.mode] || title;
   if (Q.mode === 'lesson' || (Q.mode === 'test' && passed)) markDaily('lesson');
   if (['review','mistakes','verbs','kept','quick'].includes(Q.mode)) markDaily('brain');
-  const gemsWon = !passed ? 1 : ['lesson','test'].includes(Q.mode) ? (perfect ? 10 : 5) : (perfect ? 5 : 3);
-  addXP(xp); addGems(gemsWon); bumpStreak();
+  addXP(xp); bumpStreak();
   if (perfect){ S.perfect = (S.perfect || 0) + 1; }
   save();
   const secs = Math.round((Date.now() - Q.t0) / 1000);
@@ -1266,7 +1280,6 @@ function finish(){
         h('div', { class:'ds xp' }, h('dt', {}, 'Total XP'), xpEl, h('span', { class:'ds-w' }, perfect ? 'incl. +5 bonus' : 'earned')),
         h('div', { class:'ds acc' }, h('dt', {}, 'Accuracy'), accEl, h('span', { class:'ds-w' }, accWord(acc))),
         h('div', { class:'ds time' }, h('dt', {}, 'Time'), h('dd', {}, Math.floor(secs/60)+':'+String(secs%60).padStart(2,'0')), h('span', { class:'ds-w' }, secs < 120 ? '¡Rápido!' : 'Steady'))),
-      h('p', { class:'gem-earn' }, h('span', { class:'hud-ico gem-ico', html:GEM_SVG }), '+' + gemsWon + ' gems', h('small', {}, ' · ' + gemsNow() + ' total')),
       missed.length ? h('div', { class:'missed' }, h('h3', {}, 'Worth another look'),
         h('ul', {}, missed.map(it => h('li', {}, h('button', { class:'icon-btn tiny', type:'button', 'aria-label':'Play', html:ICON.play, onclick:() => say(it.es[0]) }),
           h('span', { lang:'es', class:'m-es' }, it.es[0]), h('span', { class:'m-en' }, it.en[0]))))) : null);
@@ -1348,6 +1361,10 @@ function rIntro(ex, st){
     h('p', { class:'intro-en' }, it.en.slice(0,2).join(' · ')), it.hint ? h('p', { class:'hint' }, it.hint) : null));
 }
 function promptBlock(ex){
+  if (ex.conj){ const v = ex.conj;
+    return h('div', { class:'conj' }, h('span', { class:'conj-verb', lang:'es' }, v.verb),
+      h('span', { class:'conj-meta' }, VERB_EN[v.verb] + ', ' + TENSES[v.tense] + ' tense'),
+      h('span', { class:'conj-person', lang:'es' }, PERSONS[v.p] + ' …')); }
   if (ex.listen){ setTimeout(() => say(ex.listen), 250); return h('div', { class:'listen' }, audioBtns(ex.listen)); }
   const lang = ex.audio ? 'es' : 'en';
   return h('div', {}, h('div', { class:'big-row' }, h('span', { class:'big'+(ex.show.length > 28 ? ' long' : ''), lang }, ex.audio ? glossify(ex.show) : ex.show), ex.audio ? audioBtns(ex.audio) : null),

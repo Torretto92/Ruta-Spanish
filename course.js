@@ -422,3 +422,11 @@ const DICHOS = [
   ['Echar una mano.','To throw a hand.','To lend a hand.', null],
   ['Al mal tiempo, buena cara.','To bad weather, a good face.','Keep smiling when things go wrong.', null]
 ];
+
+/* Photos for picture questions (optional). Key = the Spanish word exactly as in COURSE,
+   value = an image URL. Words without a URL use Ruta's built-in drawing, and if a URL
+   fails to load the drawing is shown instead. Images load on your GitHub site; the
+   Claude preview blocks outside images, so it always shows the drawings.
+   Example:  'la manzana': 'https://images.unsplash.com/photo-XXXXXXXX?w=400&q=80', */
+const IMAGES = {
+};

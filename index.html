@@ -14,7 +14,8 @@
 <script>
 /* Theme boot: runs before first paint so there is no flash of the wrong theme.
    'ruta-theme' is 'light', 'dark' or absent (follow the device). */
-(function(){ try { var t = localStorage.getItem('ruta-theme');
+(function(){ try { var p = localStorage.getItem('ruta-palette') || 'mango'; document.documentElement.setAttribute('data-palette', p); } catch(e){ document.documentElement.setAttribute('data-palette', 'mango'); }
+  try { var t = localStorage.getItem('ruta-theme');
   if (t === 'light' || t === 'dark') { document.documentElement.setAttribute('data-theme', t); document.documentElement.setAttribute('data-ruta-theme', ''); } } catch(e){} })();
 </script>
 <style>
@@ -47,7 +48,7 @@
   --primary:var(--lime-500); --primary-shade:var(--lime-600); --on-primary:#FFFFFF; --primary-soft:var(--lime-100);
   --secondary:var(--sky-500); --secondary-shade:var(--sky-600); --on-secondary:#FFFFFF; --secondary-soft:var(--sky-100);
   --gold:var(--sun-500); --gold-shade:var(--sun-600); --streak:var(--tang-500);
-  --good:var(--lime-600); --good-bg:var(--lime-100); --good-shade:var(--lime-600);
+  --good:var(--lime-600); --good-bg:var(--lime-100); --good-shade:#2E8209; --on-good:#FFFFFF;
   --bad:var(--rose-500); --bad-bg:var(--rose-100); --bad-shade:var(--rose-600);
   --c-learn:var(--tang-500); --c-remember:var(--sky-500); --c-test:var(--rose-500);
   --c-practical:var(--sun-600); --c-think:var(--grape-500); --c-expression:var(--pink-500);
@@ -61,7 +62,7 @@
   --primary:var(--lime-400); --primary-shade:var(--lime-600); --on-primary:var(--night-950); --primary-soft:var(--lime-900);
   --secondary:var(--sky-400); --secondary-shade:var(--sky-600); --on-secondary:var(--night-950); --secondary-soft:var(--sky-900);
   --gold:var(--sun-400); --gold-shade:var(--sun-600); --streak:var(--tang-400);
-  --good:var(--lime-400); --good-bg:var(--lime-900); --good-shade:var(--lime-600);
+  --good:var(--lime-400); --good-bg:var(--lime-900); --good-shade:var(--lime-600); --on-good:var(--night-950);
   --bad:var(--rose-400); --bad-bg:var(--rose-900); --bad-shade:var(--rose-600);
   --c-learn:var(--tang-400); --c-remember:var(--sky-400); --c-test:var(--rose-400);
   --c-practical:var(--sun-400); --c-think:var(--grape-400); --c-expression:var(--pink-400);
@@ -73,12 +74,85 @@
   --primary:var(--lime-400); --primary-shade:var(--lime-600); --on-primary:var(--night-950); --primary-soft:var(--lime-900);
   --secondary:var(--sky-400); --secondary-shade:var(--sky-600); --on-secondary:var(--night-950); --secondary-soft:var(--sky-900);
   --gold:var(--sun-400); --gold-shade:var(--sun-600); --streak:var(--tang-400);
-  --good:var(--lime-400); --good-bg:var(--lime-900); --good-shade:var(--lime-600);
+  --good:var(--lime-400); --good-bg:var(--lime-900); --good-shade:var(--lime-600); --on-good:var(--night-950);
   --bad:var(--rose-400); --bad-bg:var(--rose-900); --bad-shade:var(--rose-600);
   --c-learn:var(--tang-400); --c-remember:var(--sky-400); --c-test:var(--rose-400);
   --c-practical:var(--sun-400); --c-think:var(--grape-400); --c-expression:var(--pink-400);
   --overlay:rgba(0,0,0,.6); --glow:rgba(255,203,61,.35);
   color-scheme:dark; }
+
+
+/* ---------- 2d. colour palettes ----------
+   A palette swaps the brand colours and tints the neutrals; it works with light and dark.
+   <html data-palette="mar|terracota|azul|uva|lima">. "lima" uses the default tokens above.
+   Correct (green), wrong (red), gold, streak and the content colours stay the same in every palette. */
+:root[data-palette="rosa"]:not([data-theme="dark"]){ --bg:#FFF7FA; --surface:#FFFFFF; --sunk:#FCEEF4; --hover:#FCEEF4; --line:#F3DCE6; --line-strong:#E2BCCD; --ink:#3A1F2B; --muted:#86677A; --primary:#E6398A; --primary-shade:#B9216A; --on-primary:#FFFFFF; --primary-soft:#FCE1EE; --secondary:#0FA3B1; --secondary-shade:#0B7E89; --on-secondary:#FFFFFF; --secondary-soft:#D9F4F6; }
+@media (prefers-color-scheme: dark){ :root[data-palette="rosa"]:not([data-theme="light"]){ --bg:#1A0F15; --surface:#22141C; --sunk:#2B1A24; --hover:#2B1A24; --line:#422938; --line-strong:#66455A; --ink:#FBEFF5; --muted:#C3A3B5; --primary:#FF6AAE; --primary-shade:#D23C85; --on-primary:#2A0717; --primary-soft:#46203A; --secondary:#3FD0DD; --secondary-shade:#0E99A6; --on-secondary:#04191C; --secondary-soft:#0E3237; } }
+:root[data-palette="rosa"][data-theme="dark"]{ --bg:#1A0F15; --surface:#22141C; --sunk:#2B1A24; --hover:#2B1A24; --line:#422938; --line-strong:#66455A; --ink:#FBEFF5; --muted:#C3A3B5; --primary:#FF6AAE; --primary-shade:#D23C85; --on-primary:#2A0717; --primary-soft:#46203A; --secondary:#3FD0DD; --secondary-shade:#0E99A6; --on-secondary:#04191C; --secondary-soft:#0E3237; }
+:root[data-palette="cielo"]:not([data-theme="dark"]){ --bg:#F2F9FD; --surface:#FFFFFF; --sunk:#E7F3FA; --hover:#E7F3FA; --line:#D0E6F2; --line-strong:#AFCFE1; --ink:#17324A; --muted:#5C7A92; --primary:#0096D6; --primary-shade:#0072A6; --on-primary:#FFFFFF; --primary-soft:#D6EFFA; --secondary:#FF7A2F; --secondary-shade:#D85C14; --on-secondary:#FFFFFF; --secondary-soft:#FFE6D6; }
+@media (prefers-color-scheme: dark){ :root[data-palette="cielo"]:not([data-theme="light"]){ --bg:#0A1724; --surface:#0E1E2E; --sunk:#13273A; --hover:#13273A; --line:#20394F; --line-strong:#3A5A76; --ink:#EAF4FB; --muted:#93B0C7; --primary:#38BDF8; --primary-shade:#0B8CC6; --on-primary:#04161F; --primary-soft:#0E3147; --secondary:#FF9A5C; --secondary-shade:#D86A2A; --on-secondary:#2A1206; --secondary-soft:#43261A; } }
+:root[data-palette="cielo"][data-theme="dark"]{ --bg:#0A1724; --surface:#0E1E2E; --sunk:#13273A; --hover:#13273A; --line:#20394F; --line-strong:#3A5A76; --ink:#EAF4FB; --muted:#93B0C7; --primary:#38BDF8; --primary-shade:#0B8CC6; --on-primary:#04161F; --primary-soft:#0E3147; --secondary:#FF9A5C; --secondary-shade:#D86A2A; --on-secondary:#2A1206; --secondary-soft:#43261A; }
+:root[data-palette="mango"]:not([data-theme="dark"]){ --primary-ink:#A06A00; --bg:#FFFBEF; --surface:#FFFFFF; --sunk:#FFF4D6; --hover:#FFF4D6; --line:#F2E3B8; --line-strong:#E0C98A; --ink:#3A2E10; --muted:#7F6E45; --primary:#FFC21A; --primary-shade:#D99A00; --on-primary:#3A2A00; --primary-soft:#FFF0C2; --secondary:#6C3BEA; --secondary-shade:#5023C4; --on-secondary:#FFFFFF; --secondary-soft:#ECE4FF; }
+@media (prefers-color-scheme: dark){ :root[data-palette="mango"]:not([data-theme="light"]){ --bg:#17130A; --surface:#1F1A0E; --sunk:#282112; --hover:#282112; --line:#3E3420; --line-strong:#61522F; --ink:#FBF5E3; --muted:#BEB08A; --primary:#FFC93D; --primary-shade:#D99A00; --on-primary:#2A1E00; --primary-soft:#3D3112; --secondary:#A58BFF; --secondary-shade:#7752F0; --on-secondary:#120B29; --secondary-soft:#271E4E; } }
+:root[data-palette="mango"][data-theme="dark"]{ --bg:#17130A; --surface:#1F1A0E; --sunk:#282112; --hover:#282112; --line:#3E3420; --line-strong:#61522F; --ink:#FBF5E3; --muted:#BEB08A; --primary:#FFC93D; --primary-shade:#D99A00; --on-primary:#2A1E00; --primary-soft:#3D3112; --secondary:#A58BFF; --secondary-shade:#7752F0; --on-secondary:#120B29; --secondary-soft:#271E4E; }
+:root[data-palette="medianoche"]:not([data-theme="dark"]){ --bg:#F6F5FF; --surface:#FFFFFF; --sunk:#EEEBFF; --hover:#EEEBFF; --line:#DDD8F5; --line-strong:#C0B8E6; --ink:#1E1B3A; --muted:#6B6690; --primary:#FF3D7F; --primary-shade:#D01F5C; --on-primary:#FFFFFF; --primary-soft:#FFE0EA; --secondary:#4F46E5; --secondary-shade:#3730A3; --on-secondary:#FFFFFF; --secondary-soft:#E5E4FF; }
+@media (prefers-color-scheme: dark){ :root[data-palette="medianoche"]:not([data-theme="light"]){ --bg:#0B0A1F; --surface:#12102B; --sunk:#191637; --hover:#191637; --line:#2A2552; --line-strong:#47407C; --ink:#F2F0FF; --muted:#A39DCC; --primary:#FF4D8D; --primary-shade:#C9205F; --on-primary:#24020F; --primary-soft:#44152E; --secondary:#7C74FF; --secondary-shade:#4F46E5; --on-secondary:#0B0A24; --secondary-soft:#232060; } }
+:root[data-palette="medianoche"][data-theme="dark"]{ --bg:#0B0A1F; --surface:#12102B; --sunk:#191637; --hover:#191637; --line:#2A2552; --line-strong:#47407C; --ink:#F2F0FF; --muted:#A39DCC; --primary:#FF4D8D; --primary-shade:#C9205F; --on-primary:#24020F; --primary-soft:#44152E; --secondary:#7C74FF; --secondary-shade:#4F46E5; --on-secondary:#0B0A24; --secondary-soft:#232060; }
+:root[data-palette="grafito"]:not([data-theme="dark"]){ --bg:#F6F6F4; --surface:#FFFFFF; --sunk:#EEEEEB; --hover:#EEEEEB; --line:#DEDDD8; --line-strong:#C2C0B8; --ink:#1C1C1A; --muted:#6F6E68; --primary:#1C1C1A; --primary-shade:#000000; --on-primary:#FFFFFF; --primary-soft:#E8E7E2; --secondary:#E0A100; --secondary-shade:#B07D00; --on-secondary:#1C1400; --secondary-soft:#FCEFC9; }
+@media (prefers-color-scheme: dark){ :root[data-palette="grafito"]:not([data-theme="light"]){ --bg:#111111; --surface:#181818; --sunk:#202020; --hover:#202020; --line:#2E2E2E; --line-strong:#4A4A4A; --ink:#F4F4F2; --muted:#A3A3A0; --primary:#F5F5F2; --primary-shade:#BDBDB8; --on-primary:#111111; --primary-soft:#2A2A2A; --secondary:#F2B705; --secondary-shade:#C08F00; --on-secondary:#1C1400; --secondary-soft:#3A3010; } }
+:root[data-palette="grafito"][data-theme="dark"]{ --bg:#111111; --surface:#181818; --sunk:#202020; --hover:#202020; --line:#2E2E2E; --line-strong:#4A4A4A; --ink:#F4F4F2; --muted:#A3A3A0; --primary:#F5F5F2; --primary-shade:#BDBDB8; --on-primary:#111111; --primary-soft:#2A2A2A; --secondary:#F2B705; --secondary-shade:#C08F00; --on-secondary:#1C1400; --secondary-soft:#3A3010; }
+:root[data-palette="vino"]:not([data-theme="dark"]){ --bg:#FBF6F7; --surface:#FFFFFF; --sunk:#F5EBEE; --hover:#F5EBEE; --line:#EBD8DD; --line-strong:#D7B8C1; --ink:#3B1A24; --muted:#85636D; --primary:#9E2A53; --primary-shade:#761A3B; --on-primary:#FFFFFF; --primary-soft:#F6DDE6; --secondary:#C9921C; --secondary-shade:#9C6E0E; --on-secondary:#FFFFFF; --secondary-soft:#F8EBCB; }
+@media (prefers-color-scheme: dark){ :root[data-palette="vino"]:not([data-theme="light"]){ --bg:#170C10; --surface:#1F1116; --sunk:#28171E; --hover:#28171E; --line:#40252F; --line-strong:#644250; --ink:#FAEFF2; --muted:#C0A1AB; --primary:#E0668F; --primary-shade:#A83A61; --on-primary:#2A0612; --primary-soft:#45192A; --secondary:#E8B84A; --secondary-shade:#B98A1C; --on-secondary:#261A00; --secondary-soft:#3D3013; } }
+:root[data-palette="vino"][data-theme="dark"]{ --bg:#170C10; --surface:#1F1116; --sunk:#28171E; --hover:#28171E; --line:#40252F; --line-strong:#644250; --ink:#FAEFF2; --muted:#C0A1AB; --primary:#E0668F; --primary-shade:#A83A61; --on-primary:#2A0612; --primary-soft:#45192A; --secondary:#E8B84A; --secondary-shade:#B98A1C; --on-secondary:#261A00; --secondary-soft:#3D3013; }
+:root[data-palette="mar"]:not([data-theme="dark"]){
+  --bg:#F2F8F8; --surface:#FFFFFF; --sunk:#E8F2F2; --hover:#E8F2F2; --line:#D3E3E3; --line-strong:#B3CBCB; --ink:#1E3435; --muted:#5D7879;
+  --primary:#0EA5A0; --primary-shade:#0A7E7A; --on-primary:#FFFFFF; --primary-soft:#D6F2F0;
+  --secondary:#5B63F0; --secondary-shade:#3F46CF; --on-secondary:#FFFFFF; --secondary-soft:#E6E7FF; }
+@media (prefers-color-scheme: dark){ :root[data-palette="mar"]:not([data-theme="light"]){
+  --bg:#0B191B; --surface:#0F2123; --sunk:#142A2D; --hover:#142A2D; --line:#223F3F; --line-strong:#3C5E5D; --ink:#E7F4F3; --muted:#92B2B0;
+  --primary:#2CCFC6; --primary-shade:#12948E; --on-primary:#04201E; --primary-soft:#0E3937;
+  --secondary:#8A90FF; --secondary-shade:#5B62E6; --on-secondary:#0E1030; --secondary-soft:#23264F; } }
+:root[data-palette="mar"][data-theme="dark"]{
+  --bg:#0B191B; --surface:#0F2123; --sunk:#142A2D; --hover:#142A2D; --line:#223F3F; --line-strong:#3C5E5D; --ink:#E7F4F3; --muted:#92B2B0;
+  --primary:#2CCFC6; --primary-shade:#12948E; --on-primary:#04201E; --primary-soft:#0E3937;
+  --secondary:#8A90FF; --secondary-shade:#5B62E6; --on-secondary:#0E1030; --secondary-soft:#23264F; }
+:root[data-palette="terracota"]:not([data-theme="dark"]){
+  --bg:#FBF6F0; --surface:#FFFDF9; --sunk:#F4ECE2; --hover:#F4ECE2; --line:#EADCCB; --line-strong:#D5C0A8; --ink:#3A2A20; --muted:#7D6959;
+  --primary:#D9622B; --primary-shade:#AE4816; --on-primary:#FFFFFF; --primary-soft:#FBE2D3;
+  --secondary:#2457C5; --secondary-shade:#183E96; --on-secondary:#FFFFFF; --secondary-soft:#E0E8FA; }
+@media (prefers-color-scheme: dark){ :root[data-palette="terracota"]:not([data-theme="light"]){
+  --bg:#191310; --surface:#211914; --sunk:#2A201A; --hover:#2A201A; --line:#3E3028; --line-strong:#604B3F; --ink:#F6ECE3; --muted:#B8A495;
+  --primary:#F08250; --primary-shade:#C25A29; --on-primary:#2A1206; --primary-soft:#43261A;
+  --secondary:#6E97FF; --secondary-shade:#3F67D9; --on-secondary:#0B1430; --secondary-soft:#1E2A4F; } }
+:root[data-palette="terracota"][data-theme="dark"]{
+  --bg:#191310; --surface:#211914; --sunk:#2A201A; --hover:#2A201A; --line:#3E3028; --line-strong:#604B3F; --ink:#F6ECE3; --muted:#B8A495;
+  --primary:#F08250; --primary-shade:#C25A29; --on-primary:#2A1206; --primary-soft:#43261A;
+  --secondary:#6E97FF; --secondary-shade:#3F67D9; --on-secondary:#0B1430; --secondary-soft:#1E2A4F; }
+:root[data-palette="azul"]:not([data-theme="dark"]){
+  --bg:#F5F7FC; --surface:#FFFFFF; --sunk:#EEF2FA; --hover:#EEF2FA; --line:#DCE3F1; --line-strong:#C0CBE1; --ink:#24304A; --muted:#6A7793;
+  --primary:#3D6CFF; --primary-shade:#2A4FCC; --on-primary:#FFFFFF; --primary-soft:#E2EAFF;
+  --secondary:#8B5CF6; --secondary-shade:#6B3FD6; --on-secondary:#FFFFFF; --secondary-soft:#EEE6FF; }
+@media (prefers-color-scheme: dark){ :root[data-palette="azul"]:not([data-theme="light"]){
+  --bg:#0E1428; --surface:#131A31; --sunk:#19223E; --hover:#19223E; --line:#29345A; --line-strong:#45547F; --ink:#EDF1FB; --muted:#98A5C6;
+  --primary:#6F93FF; --primary-shade:#3D60DE; --on-primary:#0A0F22; --primary-soft:#1B2853;
+  --secondary:#AB8DFF; --secondary-shade:#7A57E8; --on-secondary:#120B29; --secondary-soft:#271E4E; } }
+:root[data-palette="azul"][data-theme="dark"]{
+  --bg:#0E1428; --surface:#131A31; --sunk:#19223E; --hover:#19223E; --line:#29345A; --line-strong:#45547F; --ink:#EDF1FB; --muted:#98A5C6;
+  --primary:#6F93FF; --primary-shade:#3D60DE; --on-primary:#0A0F22; --primary-soft:#1B2853;
+  --secondary:#AB8DFF; --secondary-shade:#7A57E8; --on-secondary:#120B29; --secondary-soft:#271E4E; }
+
+:root[data-palette="uva"]:not([data-theme="dark"]){
+  --bg:#FAF8FE; --surface:#FFFFFF; --sunk:#F2EEFA; --hover:#F2EEFA; --line:#E4DDF2; --line-strong:#C9BFE0; --ink:#2D2440; --muted:#786E91;
+  --primary:#7B4DFF; --primary-shade:#5C30DB; --on-primary:#FFFFFF; --primary-soft:#EDE5FF;
+  --secondary:#0EAFC4; --secondary-shade:#0A8697; --on-secondary:#FFFFFF; --secondary-soft:#DBF5F9; }
+@media (prefers-color-scheme: dark){ :root[data-palette="uva"]:not([data-theme="light"]){
+  --bg:#14101E; --surface:#1A1527; --sunk:#221C33; --hover:#221C33; --line:#352C4E; --line-strong:#54497A; --ink:#F1EDFA; --muted:#A79EC1;
+  --primary:#9E7CFF; --primary-shade:#6C46E6; --on-primary:#120A26; --primary-soft:#2B2050;
+  --secondary:#40CFDF; --secondary-shade:#0E98A9; --on-secondary:#04191C; --secondary-soft:#0E3237; } }
+:root[data-palette="uva"][data-theme="dark"]{
+  --bg:#14101E; --surface:#1A1527; --sunk:#221C33; --hover:#221C33; --line:#352C4E; --line-strong:#54497A; --ink:#F1EDFA; --muted:#A79EC1;
+  --primary:#9E7CFF; --primary-shade:#6C46E6; --on-primary:#120A26; --primary-soft:#2B2050;
+  --secondary:#40CFDF; --secondary-shade:#0E98A9; --on-secondary:#04191C; --secondary-soft:#0E3237; }
 
 /* ---------- 2c. shape, type, motion (theme-independent) ---------- */
 :root{
@@ -90,6 +164,7 @@
   --lift:2px;        /* how far interactive cards rise on hover */
   --t-fast:.08s; --t:.18s;
   /* legacy aliases used by older component code */
+  --primary-ink:var(--primary);
   --accent:var(--primary); --accent-2:var(--primary-shade); --on-accent:var(--on-primary); --accent-soft:var(--primary-soft); --sun:var(--gold);
 }
 
@@ -146,20 +221,20 @@ body.in-lesson main{padding-bottom:160px}
 /* static card: thick outline, flat */
 .card{background:var(--surface);border:var(--bw) solid var(--line);border-radius:var(--r-lg);padding:18px}
 /* interactive "quiz card": thick outline + 3D lip, lifts on hover, sinks on press, recolours when selected */
-.opt,.pair,.tile,.chip,.key,.narr,.nudge,.tile-card,.unit{
+.opt,.pair,.tile,.chip,.key,.pal,.narr,.nudge,.tile-card,.unit{
   --qc-border:var(--line);--qc-shade:var(--line);--qc-bg:var(--surface);--qc-fg:var(--ink);
   background:var(--qc-bg);color:var(--qc-fg);border:var(--bw) solid var(--qc-border);border-radius:var(--r);
   box-shadow:0 var(--press) 0 var(--qc-shade);
   transition:transform var(--t-fast), box-shadow var(--t-fast), background-color var(--t), border-color var(--t), color var(--t)}
-:is(.opt,.pair,.tile,.chip,.key,.nudge,.tile-card):not(:disabled):hover{transform:translateY(calc(var(--lift) * -1));box-shadow:0 calc(var(--press) + var(--lift)) 0 var(--qc-shade);--qc-bg:var(--hover)}
+:is(.opt,.pair,.tile,.chip,.key,.pal,.nudge,.tile-card):not(:disabled):hover{transform:translateY(calc(var(--lift) * -1));box-shadow:0 calc(var(--press) + var(--lift)) 0 var(--qc-shade);--qc-bg:var(--hover)}
 :is(.opt,.pair,.tile,.chip,.key,.nudge,.tile-card):not(:disabled):active{transform:translateY(var(--press));box-shadow:0 0 0 var(--qc-shade)}
-:is(.opt,.pair,.tile,.chip,.key)[aria-pressed="true"],.narr.on{--qc-border:var(--secondary);--qc-shade:var(--secondary);--qc-bg:var(--secondary-soft);--qc-fg:var(--secondary)}
+:is(.opt,.pair,.tile,.chip,.key,.pal)[aria-pressed="true"],.narr.on{--qc-border:var(--secondary);--qc-shade:var(--secondary);--qc-bg:var(--secondary-soft);--qc-fg:var(--secondary)}
 :is(.opt,.pair).right{--qc-border:var(--good);--qc-shade:var(--good);--qc-bg:var(--good-bg);--qc-fg:var(--good)}
 :is(.opt,.pair).wrong{--qc-border:var(--bad);--qc-shade:var(--bad);--qc-bg:var(--bad-bg);--qc-fg:var(--bad)}
 :is(.opt,.pair,.tile):disabled{transform:none}
 
 /* ---------- 6. shared bits ---------- */
-.eyebrow{margin:0;font-size:13px;font-weight:900;letter-spacing:.12em;text-transform:uppercase;color:var(--primary)}
+.eyebrow{margin:0;font-size:13px;font-weight:900;letter-spacing:.12em;text-transform:uppercase;color:var(--primary-ink)}
 .eyebrow i{letter-spacing:0;text-transform:none;font-weight:700;color:var(--muted)}
 .kicker{display:flex;align-items:center;gap:8px;margin:0;font-size:13px;font-weight:900;letter-spacing:.12em;text-transform:uppercase;color:var(--cc, var(--primary))}
 .kicker::before{content:"";width:10px;height:10px;border-radius:50%;background:currentColor}
@@ -178,7 +253,7 @@ body.in-lesson main{padding-bottom:160px}
 .brand{display:flex;align-items:center;gap:10px;min-width:0}
 .mark{width:34px;height:34px;flex:none;color:var(--primary)}
 .mark svg{width:100%;height:100%;display:block}
-.brand-name{font-size:28px;font-weight:900;letter-spacing:-.01em;line-height:1;color:var(--primary)}
+.brand-name{font-size:28px;font-weight:900;letter-spacing:-.01em;line-height:1;color:var(--primary-ink)}
 .tag{font-size:11px;font-weight:900;letter-spacing:.12em;text-transform:uppercase;background:var(--secondary);color:var(--on-secondary);border-radius:8px;padding:4px 8px}
 .pills{display:flex;gap:6px;align-items:center}
 .pill{display:inline-flex;align-items:center;gap:5px;border:var(--bw) solid var(--line);border-radius:var(--r-pill);padding:5px 11px;font-size:14px;font-weight:900;font-variant-numeric:tabular-nums;color:var(--muted);white-space:nowrap}
@@ -193,7 +268,7 @@ body.in-lesson main{padding-bottom:160px}
 /* ---------- 8. hero + route ---------- */
 .hero{display:grid;gap:12px;text-align:center;justify-items:center;margin-bottom:16px}
 .hero-t{font-size:clamp(28px,8vw,38px);font-weight:900;line-height:1.1;letter-spacing:-.01em}
-.hero-t span{color:var(--primary)}
+.hero-t span{color:var(--primary-ink)}
 .route-wrap{width:100%}
 .route{width:100%;height:auto;display:block;overflow:visible}
 .road{fill:none;stroke:var(--line);stroke-width:16;stroke-linecap:round}
@@ -248,7 +323,7 @@ body.in-lesson main{padding-bottom:160px}
 .tile-card:disabled{opacity:.6}
 .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-bottom:14px}
 .grid .tile-card{margin:0}
-.big-num{font-size:48px;font-weight:900;line-height:1;margin:8px 0;font-variant-numeric:tabular-nums;color:var(--primary)}
+.big-num{font-size:48px;font-weight:900;line-height:1;margin:8px 0;font-variant-numeric:tabular-nums;color:var(--primary-ink)}
 .big-num small{font-size:15px;color:var(--muted)}
 
 /* ---------- 12. unit path ---------- */
@@ -411,6 +486,29 @@ button.hud-item:hover{background:var(--hover);border-color:var(--line)}
 /* in a lesson the bar steps aside so the lesson has the screen */
 body.in-lesson .topnav{display:none}
 
+/* palette picker */
+.palettes{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:10px;width:100%}
+.pal{display:grid;justify-items:center;gap:6px;padding:12px 6px 10px}
+.pal-sw{display:flex;gap:4px}
+.pal-sw span{width:22px;height:22px;border-radius:50%;box-shadow:inset 0 -3px 0 rgba(0,0,0,.18)}
+.pal b{font-size:14px}
+
+/* ---------- 25. speed round ---------- */
+.speed{position:relative}
+.speed-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.speed-head .ex-label{margin-top:4px}
+.speed-score{display:grid;justify-items:center;min-width:72px;padding:6px 10px;border:var(--bw) solid var(--c-think);border-radius:var(--r);box-shadow:0 4px 0 var(--c-think);color:var(--c-think)}
+.speed-score b{font-size:30px;font-weight:900;line-height:1;font-variant-numeric:tabular-nums;display:inline-block}
+.speed-score small{font-size:11px;font-weight:900;letter-spacing:.08em;text-transform:uppercase}
+.speed-time{font-weight:900;color:var(--muted);display:inline-block}
+.speed-time span:first-child{color:var(--ink);font-size:20px;font-variant-numeric:tabular-nums}
+.speed-board .pair{min-height:58px;font-size:16px}
+.speed-go{position:absolute;inset:-8px;z-index:3;display:grid;place-content:center;justify-items:center;gap:6px;background:color-mix(in srgb, var(--bg) 88%, transparent);border-radius:var(--r-lg)}
+.speed-sol{width:110px;height:128px}
+.speed-count{margin:0;font-size:64px;font-weight:900;color:var(--c-think);line-height:1}
+#bar-fill.hurry{background:var(--bad)}
+.speed-again{display:grid;grid-template-columns:1fr 1fr;gap:12px;width:100%}
+
 /* ---------- 17. lesson ---------- */
 .lesson-top{display:flex;align-items:center;gap:12px;margin-bottom:24px}
 .lesson-top .icon-btn{--ib-bg:transparent;--ib-fg:var(--muted);--ib-shade:transparent;border-color:transparent}
@@ -508,7 +606,7 @@ body.in-lesson .topnav{display:none}
 #bar-btn{flex:1 1 160px}
 .checkbar.good{background:var(--good-bg);border-color:transparent}
 .checkbar.good #bar-msg{color:var(--good)}
-.checkbar.good #bar-btn{--btn-bg:var(--primary);--btn-shade:var(--primary-shade);--btn-fg:var(--on-primary)}
+.checkbar.good #bar-btn{--btn-bg:var(--good);--btn-shade:var(--good-shade);--btn-fg:var(--on-good)}
 .checkbar.bad{background:var(--bad-bg);border-color:transparent}
 .checkbar.bad #bar-msg{color:var(--bad)}
 .checkbar.bad #bar-btn{--btn-bg:var(--bad);--btn-shade:var(--bad-shade);--btn-fg:#FFFFFF}
@@ -586,7 +684,7 @@ body.in-lesson .topnav{display:none}
 .switch input{width:22px;height:22px;accent-color:var(--primary);margin-top:2px;flex:none}
 .switch small{display:block;font-weight:600;color:var(--muted)}
 textarea{width:100%;border-radius:var(--r-sm);border:var(--bw) solid var(--line);background:var(--sunk);padding:10px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px;font-weight:400;resize:vertical}
-.status{margin:0;font-weight:900;color:var(--primary);min-height:1.5em}
+.status{margin:0;font-weight:900;color:var(--primary-ink);min-height:1.5em}
 .confirm{display:flex;flex-wrap:wrap;gap:8px;align-items:center;background:var(--bad-bg);border-radius:var(--r);padding:12px}
 .confirm span{flex:1 1 200px;color:var(--bad);font-weight:900}
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(90px + env(safe-area-inset-bottom, 0px));z-index:30;background:var(--ink);color:var(--bg);padding:11px 20px;border-radius:var(--r);font-weight:900;max-width:calc(100% - 32px);text-align:center;box-shadow:0 4px 0 rgba(0,0,0,.2)}
@@ -1206,7 +1304,7 @@ const TYPES = {
 
 /* ---------- state ---------- */
 function fresh(){ return { v:1, units:{}, srs:{}, xp:0, today:{d:'',xp:0}, streak:{n:0,last:''},
-  settings:{ rate:0.85, voice:'', theme:'system', goal:30, speak:true, sfx:true }, stats:{ answers:0, correct:0 } }; }
+  settings:{ rate:0.85, voice:'', theme:'system', palette:'mango', goal:30, speak:true, sfx:true }, stats:{ answers:0, correct:0 } }; }
 let S = fresh();
 function load(){ try { const r = localStorage.getItem(STORE); if (r) adopt(JSON.parse(r)); } catch(e){} }
 function adopt(o){ const f = fresh(); S = Object.assign(f, o); S.settings = Object.assign(fresh().settings, o.settings || {}); S.stats = Object.assign(fresh().stats, o.stats || {}); }
@@ -1840,6 +1938,26 @@ function applyTheme(t){
   try { if (t === 'system') localStorage.removeItem(THEME_KEY); else localStorage.setItem(THEME_KEY, t); } catch(e){}
   syncThemeColor();
 }
+const PALETTES = [
+  ['mango', 'Mango', ['#FFC21A', '#6C3BEA', '#3A2E10']],
+  ['mar',  'Mar',  ['#0EA5A0', '#5B63F0', '#FFB703']],
+  ['rosa', 'Rosa', ['#E6398A', '#0FA3B1', '#FFB703']],
+  ['cielo', 'Cielo', ['#0096D6', '#FF7A2F', '#FFB703']],
+  ['medianoche', 'Medianoche', ['#FF3D7F', '#4F46E5', '#0B0A1F']],
+  ['grafito', 'Grafito', ['#1C1C1A', '#E0A100', '#F6F6F4']],
+  ['vino', 'Vino', ['#9E2A53', '#C9921C', '#FBF6F7']],
+  ['terracota', 'Terracota', ['#D9622B', '#2457C5', '#FFB703']],
+  ['azul', 'Azul', ['#3D6CFF', '#8B5CF6', '#FFB703']],
+  ['uva',  'Uva',  ['#7B4DFF', '#0EAFC4', '#FFB703']],
+  ['lima', 'Lima', ['#4CC51C', '#1AA6EE', '#FFB703']]
+];
+function applyPalette(p){
+  p = PALETTES.some(x => x[0] === p) ? p : 'mango';
+  document.documentElement.setAttribute('data-palette', p);
+  try { localStorage.setItem('ruta-palette', p); } catch(e){}
+  syncThemeColor();
+}
+function setPalette(p){ S.settings.palette = p; S.settings.paletteChosen = true; save(); applyPalette(p); if (!$('#home').hidden) renderHome(); }
 function setTheme(t){ S.settings.theme = t; save(); applyTheme(t); if (!$('#home').hidden) renderHome(); }
 function syncThemeColor(){
   const m = document.querySelector('meta[name="theme-color"]');
@@ -2061,6 +2179,7 @@ function renderPractice(home){
       tile('c-remember', 'Review', 'repasar', due ? due + ' ready to review' : 'All caught up', due ? 'Cards whose timer has run out. Do these first.' : 'Come back later. Cards return as they start to fade.', due, () => startSession('review')),
       tile('c-test', 'Mistakes', 'errores', weak ? 'Fix ' + weak + ' weak spots' : 'No weak spots', 'Only the things you keep getting wrong.', weak, () => startSession('mistakes')),
       tile('c-practical', 'Verbs', 'verbos', 'Verb drill', 'Conjugate the verbs you\'ve unlocked, person by person.', 1, () => startSession('verbs')),
+      tile('c-think', 'Speed', 'rápido', 'Speed round', (S.speedBest ? 'Your best: ' + S.speedBest + ' pairs. ' : '') + SPEED_SECS + ' seconds to match as many pairs as you can.', 1, () => startSpeed()),
       tile('c-learn', 'Kept', 'guardados', kept ? 'Practise ' + kept + ' kept cards' : 'Nothing kept yet', 'Bookmark words and phrases in Scroll to practise them here.', kept, () => startSession('kept'))),
     h('section', { class:'card' }, h('h2', { class:'card-h' }, 'Words known'),
       h('p', { class:'big-num' }, String(learnedWords()), h('small', {}, ' of ' + ALL.filter(i => i.kind === 'w').length)),
@@ -2363,6 +2482,120 @@ function resolve(res){
   if (res.ok) mascotPop(hot);
   $('#bar-btn').focus({ preventScroll:true });
 }
+/* ---------- speed round ----------
+   60 seconds to match as many Spanish ↔ English pairs as possible.
+   Matched pairs are replaced straight away, a wrong match costs 2 seconds.
+   Offered at random after sessions, and always available on the Practise tab. */
+const SPEED_SECS = 60, SPEED_ROWS = 5, SPEED_PENALTY = 2;
+let SP = null;
+function speedPool(){
+  let pool = ALL.filter(i => i.kind === 'w' && unlocked(i.u));
+  if (pool.length < 12) pool = ALL.filter(i => i.kind === 'w' && i.u <= 1);
+  return pool;
+}
+function speedDraw(){
+  /* next word whose Spanish and English don't clash with anything on the board */
+  const onBoard = new Set(SP.left.filter(Boolean).flatMap(it => [...it.es.map(norm), ...it.en.map(norm)]));
+  for (let tries = 0; tries < 60; tries++){
+    if (!SP.bag.length) SP.bag = shuffle(speedPool());
+    const it = SP.bag.pop();
+    if (![...it.es, ...it.en].some(x => onBoard.has(norm(x)))) return it;
+  }
+  return SP.bag.pop() || speedPool()[0];
+}
+function startSpeed(){
+  stopListen(); mascotHide(); pickVoice();
+  Q = null; clearInterval(SP && SP.tick);
+  SP = { bag:shuffle(speedPool()), left:[], right:[], score:0, misses:0, end:0, selL:null, selR:null, running:false, tick:null };
+  for (let i = 0; i < SPEED_ROWS; i++) SP.left.push(speedDraw());
+  SP.right = shuffle(SP.left.slice());
+  $('#quit').hidden = true; $('#checkbar').hidden = true; $('#bar-fill').style.width = '100%';
+  const st = $('#stage'); st.innerHTML = '';
+  st.append(h('div', { class:'ex speed' },
+    h('div', { class:'speed-head' },
+      h('div', {}, h('p', { class:'kicker c-think' }, 'Speed round', h('i', { lang:'es' }, ' · ronda rápida')), h('p', { class:'ex-label' }, 'Match as many pairs as you can')),
+      h('div', { class:'speed-score' }, h('b', { id:'sp-score' }, '0'), h('small', {}, 'pairs'))),
+    h('div', { class:'speed-time' }, h('span', { id:'sp-secs' }, String(SPEED_SECS)), 's left', h('span', { class:'small' }, ' · best ' + (S.speedBest || 0))),
+    h('div', { class:'match speed-board' }, h('div', { class:'col', id:'sp-left' }), h('div', { class:'col', id:'sp-right' })),
+    h('div', { class:'speed-go', id:'sp-go' }, h('div', { class:'speed-sol' }, solEl('bounce')), h('p', { class:'speed-count', id:'sp-count' }, '3'))));
+  show('lesson'); drawSpeed();
+  /* 3-2-1 countdown, then go */
+  let c = 3; sfx(true);
+  const cd = setInterval(() => { c--; const el = $('#sp-count'); if (!el){ clearInterval(cd); return; }
+    if (c > 0){ el.textContent = String(c); sfx(true); anim(el, { transform:['scale(1.4)', 'scale(1)'] }, { spring:SPRING.pop }); }
+    else { clearInterval(cd); el.textContent = '¡Ya!'; fanfare(false); setTimeout(() => { const g = $('#sp-go'); if (g) g.hidden = true; runSpeed(); }, 450); } }, 700);
+}
+function runSpeed(){
+  SP.running = true; SP.end = Date.now() + SPEED_SECS * 1000;
+  SP.tick = setInterval(() => {
+    const left = Math.max(0, SP.end - Date.now());
+    const pct = left / (SPEED_SECS * 1000) * 100;
+    const fill = $('#bar-fill'); if (fill){ fill.style.width = pct + '%'; fill.classList.toggle('hurry', left < 10000); }
+    const secs = $('#sp-secs'); if (secs) secs.textContent = String(Math.ceil(left / 1000));
+    if (left <= 0) endSpeed();
+  }, 100);
+}
+function drawSpeed(){
+  const L = $('#sp-left'), R = $('#sp-right'); if (!L) return;
+  L.innerHTML = ''; R.innerHTML = '';
+  SP.left.forEach((it, i) => L.append(h('button', { class:'pair' + (SP.selL === i ? '' : ''), type:'button', lang:'es', 'aria-pressed': String(SP.selL === i),
+    onclick:() => pickSpeed('L', i) }, it.es[0])));
+  SP.right.forEach((it, i) => R.append(h('button', { class:'pair', type:'button', lang:'en', 'aria-pressed': String(SP.selR === i),
+    onclick:() => pickSpeed('R', i) }, it.en[0])));
+}
+function pickSpeed(side, i){
+  if (!SP || !SP.running) return;
+  if (side === 'L') SP.selL = SP.selL === i ? null : i; else SP.selR = SP.selR === i ? null : i;
+  if (SP.selL == null || SP.selR == null){ drawSpeed(); return; }
+  const a = SP.left[SP.selL], b = SP.right[SP.selR], li = SP.selL, ri = SP.selR;
+  SP.selL = SP.selR = null;
+  if (a === b){
+    SP.score++; sfx(true);
+    const next = speedDraw();
+    SP.left[li] = next;
+    /* put the new English somewhere random so the rows don't line up */
+    SP.right.splice(ri, 1); SP.right.splice(rnd(SP.right.length + 1), 0, next);
+    drawSpeed();
+    const sc = $('#sp-score'); sc.textContent = String(SP.score); anim(sc, { transform:['scale(1.5)', 'scale(1)'] }, { spring:SPRING.pop });
+    const nl = $('#sp-left').children[li]; anim(nl, { opacity:[0, 1], transform:['scale(.85)', 'scale(1)'] }, { spring:SPRING.pop });
+  } else {
+    SP.misses++; SP.end -= SPEED_PENALTY * 1000; sfx(false);
+    drawSpeed();
+    [$('#sp-left').children[li], $('#sp-right').children[ri]].forEach(el => { el.classList.add('shake'); setTimeout(() => el.classList.remove('shake'), 400); });
+    const t = $('.speed-time'); anim(t, { transform:['translateX(0px)', 'translateX(-5px)', 'translateX(5px)', 'translateX(0px)'] }, { duration:0.3 });
+  }
+}
+function endSpeed(){
+  if (!SP || !SP.running) return;
+  SP.running = false; clearInterval(SP.tick);
+  const fill = $('#bar-fill'); if (fill) fill.classList.remove('hurry');
+  const score = SP.score, prev = S.speedBest || 0, record = score > prev && score > 0;
+  if (record) S.speedBest = score;
+  S.speedDay = dstr();
+  const xp = Math.ceil(score / 2);
+  if (score > 0){ addXP(xp); bumpStreak(); markDaily('brain'); }
+  save();
+  $('#checkbar').hidden = false;
+  const done = $('#done'); done.innerHTML = '';
+  done.append(h('div', { class:'done-card center pop' + (record ? ' perfect' : '') },
+    record ? h('div', { class:'medal', html:STAR }) : h('div', { class:'done-sol' }, solEl('cheer')),
+    h('p', { class:'eyebrow' }, record ? 'Nuevo récord · new best' : '¡Tiempo! · time\'s up'),
+    h('h2', {}, score + (score === 1 ? ' pair' : ' pairs')),
+    h('p', { class:'done-note' }, record ? (prev ? 'You beat your old best of ' + prev + '.' : 'Your first speed round score. Now beat it!') : 'Your best is ' + prev + '. ' + (prev - score <= 2 && score > 0 ? 'So close!' : 'Give it another go.')),
+    h('dl', { class:'done-stats' },
+      h('div', { class:'ds xp' }, h('dt', {}, 'XP'), h('dd', {}, '+' + xp), h('span', { class:'ds-w' }, 'earned')),
+      h('div', { class:'ds acc' }, h('dt', {}, 'Pairs'), h('dd', {}, String(score)), h('span', { class:'ds-w' }, score >= 20 ? '¡Rapidísimo!' : score >= 12 ? '¡Rápido!' : 'Warming up')),
+      h('div', { class:'ds time' }, h('dt', {}, 'Slips'), h('dd', {}, String(SP.misses)), h('span', { class:'ds-w' }, SP.misses ? '−' + SP.misses * SPEED_PENALTY + 's' : 'none'))),
+    h('div', { class:'speed-again' },
+      h('button', { class:'btn ghost wide', type:'button', onclick:() => startSpeed() }, 'Play again'),
+      h('button', { class:'btn primary wide', type:'button', id:'done-btn', onclick:() => { SP = null; renderHome(); show('home'); } }, 'Continue'))));
+  show('done');
+  if (record){ confetti(true); fanfare(true); } else if (score > 0) fanfare(false);
+}
+function stopSpeed(){ if (SP){ SP.running = false; clearInterval(SP.tick); SP = null; } const cb = $('#checkbar'); if (cb) cb.hidden = false; }
+/* the random surprise after a session: more likely if you haven't played today */
+function speedChance(){ return S.speedDay === dstr() ? 0.15 : 0.4; }
+
 /* ---------- finish: celebration screens ---------- */
 function fanfare(big){
   if (!S.settings.sfx) return;
@@ -2484,12 +2717,20 @@ function finish(){
       routeMap(),
       Q.bandUp ? h('div', { class:'levels' }, bandRow(Q.bandUp.band, true), h('p', { class:'small' }, BANDS[Q.bandUp.band] + ' went from ' + Q.bandUp.p0 + '% to ' + Q.bandUp.p1 + '%.')) : null);
   });
+  /* surprise speed round, at random */
+  const surprise = passed && Math.random() < speedChance() && speedPool().length >= 8;
   /* 5. level up */
   if (lvUp) screens.push(() => { confetti(false); fanfare(true);
     return h('div', { class:'done-card center' }, h('div', { class:'medal lv-medal' }, h('span', {}, 'Lv'), h('b', {}, String(userLevel()))),
       h('p', { class:'eyebrow' }, 'Nuevo nivel · level up'), h('h2', {}, 'You reached level ' + userLevel()),
       h('p', { class:'done-note' }, levelSpan().need + ' XP to level ' + (userLevel() + 1) + '.')); });
 
+  if (surprise){ const sc = () => { setTimeout(() => solPlay(document.querySelector('#done .sol'), 'cheer', 1200), 200);
+      return h('div', { class:'done-card center' }, h('div', { class:'done-sol' }, solEl('bounce')),
+        h('p', { class:'eyebrow' }, '¡Sorpresa! · surprise'), h('h2', {}, 'Speed round?'),
+        h('p', { class:'done-note' }, SPEED_SECS + ' seconds to match as many pairs as you can. Your best: ' + (S.speedBest || 0) + '.'),
+        h('button', { class:'btn secondary wide', type:'button', onclick:() => { Q = null; startSpeed(); } }, '⚡ Play now')); };
+    sc.skip = 'Not now'; screens.push(sc); }
   let si = 0;
   const done = $('#done');
   const paint = () => {
@@ -2499,8 +2740,8 @@ function finish(){
     node.classList.add('pop');
     done.append(node,
       screens.length > 1 ? h('div', { class:'dots', 'aria-hidden':'true' }, screens.map((_, i) => h('span', { class: i === si ? 'on' : '' }))) : null,
-      h('button', { class:'btn primary wide', type:'button', id:'done-btn', onclick:() => {
-        if (!last){ si++; paint(); window.scrollTo(0,0); } else { Q = null; renderHome(); show('home'); } } }, last ? 'Continue' : 'Next'));
+      h('button', { class:'btn ' + (screens[si].skip ? 'ghost' : 'primary') + ' wide', type:'button', id:'done-btn', onclick:() => {
+        if (!last){ si++; paint(); window.scrollTo(0,0); } else { Q = null; renderHome(); show('home'); } } }, screens[si].skip || (last ? 'Continue' : 'Next')));
     setTimeout(() => { const b = $('#done-btn'); if (b) b.focus(); }, 50);
   };
   show('done'); paint();
@@ -2756,6 +2997,10 @@ function settingsNodes(){
     (() => { const inp = h('input', { id:'set-name', class:'answer', type:'text', maxlength:'24', autocomplete:'given-name', placeholder:'Your first name', value:S.settings.name || '' });
       inp.addEventListener('change', () => { S.settings.name = inp.value.trim(); save(); renderHome(); });
       return h('div', { class:'field' }, h('label', { for:'set-name' }, 'Your name'), inp, h('p', { class:'small' }, 'Shown as your profile picture. Leave it empty to use Sol.')); })(),
+    h('div', { class:'field' }, h('span', { class:'lbl' }, 'Colours'),
+      h('div', { class:'palettes', role:'group', 'aria-label':'Colour theme' }, PALETTES.map(([id, name, sw]) =>
+        h('button', { class:'pal', type:'button', 'aria-pressed': String((S.settings.palette || 'mango') === id), onclick:() => setPalette(id) },
+          h('span', { class:'pal-sw', 'aria-hidden':'true' }, sw.map(c => h('span', { style:'background:' + c }))), h('b', {}, name))))),
     h('div', { class:'field' }, h('span', { class:'lbl' }, 'Appearance'), seg, h('p', { class:'small' }, 'Auto follows your phone or computer.')),
     (() => { const all = esVoices();
       const sel = h('select', { id:'set-voice' }, all.map(v => h('option', { value:vid(v), selected: VOICE && vid(v) === vid(VOICE) }, vLabel(v))));
@@ -2779,7 +3024,7 @@ function settingsNodes(){
       catch(e){ code.select(); status.textContent = 'Press Ctrl+C or Cmd+C to copy.'; } } }, 'Copy backup code'),
     restore, h('button', { class:'btn small soft', type:'button', onclick:() => {
       try { const o = JSON.parse(decodeURIComponent(escape(atob(restore.value.trim())))); if (!o || !o.srs) throw 0;
-        adopt(o); save(); applyTheme(S.settings.theme); renderHome(); status.textContent = 'Progress restored.'; }
+        adopt(o); save(); applyTheme(S.settings.theme); applyPalette(S.settings.palette); renderHome(); status.textContent = 'Progress restored.'; }
       catch(e){ status.textContent = 'That code didn\'t work. Copy the whole code and try again.'; } } }, 'Restore from code'),
     status,
     h('h3', {}, 'Start over'),
@@ -2790,7 +3035,8 @@ function settingsNodes(){
 /* ---------- boot ---------- */
 function boot(){
   load();
-  applyTheme(S.settings.theme);
+  if (!S.settings.mangoSet){ S.settings.palette = 'mango'; S.settings.mangoSet = true; save(); }   /* Mango is the chosen look */
+  applyTheme(S.settings.theme); applyPalette(S.settings.palette);
   if (darkMQ) (darkMQ.addEventListener ? darkMQ.addEventListener('change', () => { syncThemeColor(); if (!$('#home').hidden) renderHome(); }) : darkMQ.addListener(syncThemeColor));
   pickVoice();
   [300, 1000, 2500, 5000].forEach(t => setTimeout(() => { const before = VOICE && vid(VOICE); pickVoice(); pickEnVoice(); if ((VOICE && vid(VOICE)) !== before && !$('#home').hidden && (TAB === 'listen' || TAB === 'me')) renderHome(); }, t));
@@ -2802,7 +3048,7 @@ function boot(){
   $('#sheet').addEventListener('click', e => { if (e.target.id === 'sheet') closeSheet(); });
   $('#close-lesson').addEventListener('click', () => { $('#quit').hidden = false; $('#quit-keep').focus(); });
   $('#quit-keep').addEventListener('click', () => $('#quit').hidden = true);
-  $('#quit-go').addEventListener('click', () => { save(); Q = null; renderHome(); show('home'); });
+  $('#quit-go').addEventListener('click', () => { stopSpeed(); save(); Q = null; renderHome(); show('home'); });
   document.addEventListener('keydown', e => {
     if (!$('#sheet').hidden){ if (e.key === 'Escape') closeSheet(); return; }
     if (!Q || $('#lesson').hidden) return;

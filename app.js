@@ -37,7 +37,7 @@ const TYPES = {
 
 /* ---------- state ---------- */
 function fresh(){ return { v:1, units:{}, srs:{}, xp:0, today:{d:'',xp:0}, streak:{n:0,last:''},
-  settings:{ rate:0.85, voice:'', theme:'system', goal:30, speak:true, sfx:true }, stats:{ answers:0, correct:0 } }; }
+  settings:{ rate:0.85, voice:'', theme:'system', palette:'mango', goal:30, speak:true, sfx:true }, stats:{ answers:0, correct:0 } }; }
 let S = fresh();
 function load(){ try { const r = localStorage.getItem(STORE); if (r) adopt(JSON.parse(r)); } catch(e){} }
 function adopt(o){ const f = fresh(); S = Object.assign(f, o); S.settings = Object.assign(fresh().settings, o.settings || {}); S.stats = Object.assign(fresh().stats, o.stats || {}); }
@@ -671,6 +671,26 @@ function applyTheme(t){
   try { if (t === 'system') localStorage.removeItem(THEME_KEY); else localStorage.setItem(THEME_KEY, t); } catch(e){}
   syncThemeColor();
 }
+const PALETTES = [
+  ['mango', 'Mango', ['#FFC21A', '#6C3BEA', '#3A2E10']],
+  ['mar',  'Mar',  ['#0EA5A0', '#5B63F0', '#FFB703']],
+  ['rosa', 'Rosa', ['#E6398A', '#0FA3B1', '#FFB703']],
+  ['cielo', 'Cielo', ['#0096D6', '#FF7A2F', '#FFB703']],
+  ['medianoche', 'Medianoche', ['#FF3D7F', '#4F46E5', '#0B0A1F']],
+  ['grafito', 'Grafito', ['#1C1C1A', '#E0A100', '#F6F6F4']],
+  ['vino', 'Vino', ['#9E2A53', '#C9921C', '#FBF6F7']],
+  ['terracota', 'Terracota', ['#D9622B', '#2457C5', '#FFB703']],
+  ['azul', 'Azul', ['#3D6CFF', '#8B5CF6', '#FFB703']],
+  ['uva',  'Uva',  ['#7B4DFF', '#0EAFC4', '#FFB703']],
+  ['lima', 'Lima', ['#4CC51C', '#1AA6EE', '#FFB703']]
+];
+function applyPalette(p){
+  p = PALETTES.some(x => x[0] === p) ? p : 'mango';
+  document.documentElement.setAttribute('data-palette', p);
+  try { localStorage.setItem('ruta-palette', p); } catch(e){}
+  syncThemeColor();
+}
+function setPalette(p){ S.settings.palette = p; S.settings.paletteChosen = true; save(); applyPalette(p); if (!$('#home').hidden) renderHome(); }
 function setTheme(t){ S.settings.theme = t; save(); applyTheme(t); if (!$('#home').hidden) renderHome(); }
 function syncThemeColor(){
   const m = document.querySelector('meta[name="theme-color"]');
@@ -892,6 +912,7 @@ function renderPractice(home){
       tile('c-remember', 'Review', 'repasar', due ? due + ' ready to review' : 'All caught up', due ? 'Cards whose timer has run out. Do these first.' : 'Come back later. Cards return as they start to fade.', due, () => startSession('review')),
       tile('c-test', 'Mistakes', 'errores', weak ? 'Fix ' + weak + ' weak spots' : 'No weak spots', 'Only the things you keep getting wrong.', weak, () => startSession('mistakes')),
       tile('c-practical', 'Verbs', 'verbos', 'Verb drill', 'Conjugate the verbs you\'ve unlocked, person by person.', 1, () => startSession('verbs')),
+      tile('c-think', 'Speed', 'rápido', 'Speed round', (S.speedBest ? 'Your best: ' + S.speedBest + ' pairs. ' : '') + SPEED_SECS + ' seconds to match as many pairs as you can.', 1, () => startSpeed()),
       tile('c-learn', 'Kept', 'guardados', kept ? 'Practise ' + kept + ' kept cards' : 'Nothing kept yet', 'Bookmark words and phrases in Scroll to practise them here.', kept, () => startSession('kept'))),
     h('section', { class:'card' }, h('h2', { class:'card-h' }, 'Words known'),
       h('p', { class:'big-num' }, String(learnedWords()), h('small', {}, ' of ' + ALL.filter(i => i.kind === 'w').length)),
@@ -1194,6 +1215,120 @@ function resolve(res){
   if (res.ok) mascotPop(hot);
   $('#bar-btn').focus({ preventScroll:true });
 }
+/* ---------- speed round ----------
+   60 seconds to match as many Spanish ↔ English pairs as possible.
+   Matched pairs are replaced straight away, a wrong match costs 2 seconds.
+   Offered at random after sessions, and always available on the Practise tab. */
+const SPEED_SECS = 60, SPEED_ROWS = 5, SPEED_PENALTY = 2;
+let SP = null;
+function speedPool(){
+  let pool = ALL.filter(i => i.kind === 'w' && unlocked(i.u));
+  if (pool.length < 12) pool = ALL.filter(i => i.kind === 'w' && i.u <= 1);
+  return pool;
+}
+function speedDraw(){
+  /* next word whose Spanish and English don't clash with anything on the board */
+  const onBoard = new Set(SP.left.filter(Boolean).flatMap(it => [...it.es.map(norm), ...it.en.map(norm)]));
+  for (let tries = 0; tries < 60; tries++){
+    if (!SP.bag.length) SP.bag = shuffle(speedPool());
+    const it = SP.bag.pop();
+    if (![...it.es, ...it.en].some(x => onBoard.has(norm(x)))) return it;
+  }
+  return SP.bag.pop() || speedPool()[0];
+}
+function startSpeed(){
+  stopListen(); mascotHide(); pickVoice();
+  Q = null; clearInterval(SP && SP.tick);
+  SP = { bag:shuffle(speedPool()), left:[], right:[], score:0, misses:0, end:0, selL:null, selR:null, running:false, tick:null };
+  for (let i = 0; i < SPEED_ROWS; i++) SP.left.push(speedDraw());
+  SP.right = shuffle(SP.left.slice());
+  $('#quit').hidden = true; $('#checkbar').hidden = true; $('#bar-fill').style.width = '100%';
+  const st = $('#stage'); st.innerHTML = '';
+  st.append(h('div', { class:'ex speed' },
+    h('div', { class:'speed-head' },
+      h('div', {}, h('p', { class:'kicker c-think' }, 'Speed round', h('i', { lang:'es' }, ' · ronda rápida')), h('p', { class:'ex-label' }, 'Match as many pairs as you can')),
+      h('div', { class:'speed-score' }, h('b', { id:'sp-score' }, '0'), h('small', {}, 'pairs'))),
+    h('div', { class:'speed-time' }, h('span', { id:'sp-secs' }, String(SPEED_SECS)), 's left', h('span', { class:'small' }, ' · best ' + (S.speedBest || 0))),
+    h('div', { class:'match speed-board' }, h('div', { class:'col', id:'sp-left' }), h('div', { class:'col', id:'sp-right' })),
+    h('div', { class:'speed-go', id:'sp-go' }, h('div', { class:'speed-sol' }, solEl('bounce')), h('p', { class:'speed-count', id:'sp-count' }, '3'))));
+  show('lesson'); drawSpeed();
+  /* 3-2-1 countdown, then go */
+  let c = 3; sfx(true);
+  const cd = setInterval(() => { c--; const el = $('#sp-count'); if (!el){ clearInterval(cd); return; }
+    if (c > 0){ el.textContent = String(c); sfx(true); anim(el, { transform:['scale(1.4)', 'scale(1)'] }, { spring:SPRING.pop }); }
+    else { clearInterval(cd); el.textContent = '¡Ya!'; fanfare(false); setTimeout(() => { const g = $('#sp-go'); if (g) g.hidden = true; runSpeed(); }, 450); } }, 700);
+}
+function runSpeed(){
+  SP.running = true; SP.end = Date.now() + SPEED_SECS * 1000;
+  SP.tick = setInterval(() => {
+    const left = Math.max(0, SP.end - Date.now());
+    const pct = left / (SPEED_SECS * 1000) * 100;
+    const fill = $('#bar-fill'); if (fill){ fill.style.width = pct + '%'; fill.classList.toggle('hurry', left < 10000); }
+    const secs = $('#sp-secs'); if (secs) secs.textContent = String(Math.ceil(left / 1000));
+    if (left <= 0) endSpeed();
+  }, 100);
+}
+function drawSpeed(){
+  const L = $('#sp-left'), R = $('#sp-right'); if (!L) return;
+  L.innerHTML = ''; R.innerHTML = '';
+  SP.left.forEach((it, i) => L.append(h('button', { class:'pair' + (SP.selL === i ? '' : ''), type:'button', lang:'es', 'aria-pressed': String(SP.selL === i),
+    onclick:() => pickSpeed('L', i) }, it.es[0])));
+  SP.right.forEach((it, i) => R.append(h('button', { class:'pair', type:'button', lang:'en', 'aria-pressed': String(SP.selR === i),
+    onclick:() => pickSpeed('R', i) }, it.en[0])));
+}
+function pickSpeed(side, i){
+  if (!SP || !SP.running) return;
+  if (side === 'L') SP.selL = SP.selL === i ? null : i; else SP.selR = SP.selR === i ? null : i;
+  if (SP.selL == null || SP.selR == null){ drawSpeed(); return; }
+  const a = SP.left[SP.selL], b = SP.right[SP.selR], li = SP.selL, ri = SP.selR;
+  SP.selL = SP.selR = null;
+  if (a === b){
+    SP.score++; sfx(true);
+    const next = speedDraw();
+    SP.left[li] = next;
+    /* put the new English somewhere random so the rows don't line up */
+    SP.right.splice(ri, 1); SP.right.splice(rnd(SP.right.length + 1), 0, next);
+    drawSpeed();
+    const sc = $('#sp-score'); sc.textContent = String(SP.score); anim(sc, { transform:['scale(1.5)', 'scale(1)'] }, { spring:SPRING.pop });
+    const nl = $('#sp-left').children[li]; anim(nl, { opacity:[0, 1], transform:['scale(.85)', 'scale(1)'] }, { spring:SPRING.pop });
+  } else {
+    SP.misses++; SP.end -= SPEED_PENALTY * 1000; sfx(false);
+    drawSpeed();
+    [$('#sp-left').children[li], $('#sp-right').children[ri]].forEach(el => { el.classList.add('shake'); setTimeout(() => el.classList.remove('shake'), 400); });
+    const t = $('.speed-time'); anim(t, { transform:['translateX(0px)', 'translateX(-5px)', 'translateX(5px)', 'translateX(0px)'] }, { duration:0.3 });
+  }
+}
+function endSpeed(){
+  if (!SP || !SP.running) return;
+  SP.running = false; clearInterval(SP.tick);
+  const fill = $('#bar-fill'); if (fill) fill.classList.remove('hurry');
+  const score = SP.score, prev = S.speedBest || 0, record = score > prev && score > 0;
+  if (record) S.speedBest = score;
+  S.speedDay = dstr();
+  const xp = Math.ceil(score / 2);
+  if (score > 0){ addXP(xp); bumpStreak(); markDaily('brain'); }
+  save();
+  $('#checkbar').hidden = false;
+  const done = $('#done'); done.innerHTML = '';
+  done.append(h('div', { class:'done-card center pop' + (record ? ' perfect' : '') },
+    record ? h('div', { class:'medal', html:STAR }) : h('div', { class:'done-sol' }, solEl('cheer')),
+    h('p', { class:'eyebrow' }, record ? 'Nuevo récord · new best' : '¡Tiempo! · time\'s up'),
+    h('h2', {}, score + (score === 1 ? ' pair' : ' pairs')),
+    h('p', { class:'done-note' }, record ? (prev ? 'You beat your old best of ' + prev + '.' : 'Your first speed round score. Now beat it!') : 'Your best is ' + prev + '. ' + (prev - score <= 2 && score > 0 ? 'So close!' : 'Give it another go.')),
+    h('dl', { class:'done-stats' },
+      h('div', { class:'ds xp' }, h('dt', {}, 'XP'), h('dd', {}, '+' + xp), h('span', { class:'ds-w' }, 'earned')),
+      h('div', { class:'ds acc' }, h('dt', {}, 'Pairs'), h('dd', {}, String(score)), h('span', { class:'ds-w' }, score >= 20 ? '¡Rapidísimo!' : score >= 12 ? '¡Rápido!' : 'Warming up')),
+      h('div', { class:'ds time' }, h('dt', {}, 'Slips'), h('dd', {}, String(SP.misses)), h('span', { class:'ds-w' }, SP.misses ? '−' + SP.misses * SPEED_PENALTY + 's' : 'none'))),
+    h('div', { class:'speed-again' },
+      h('button', { class:'btn ghost wide', type:'button', onclick:() => startSpeed() }, 'Play again'),
+      h('button', { class:'btn primary wide', type:'button', id:'done-btn', onclick:() => { SP = null; renderHome(); show('home'); } }, 'Continue'))));
+  show('done');
+  if (record){ confetti(true); fanfare(true); } else if (score > 0) fanfare(false);
+}
+function stopSpeed(){ if (SP){ SP.running = false; clearInterval(SP.tick); SP = null; } const cb = $('#checkbar'); if (cb) cb.hidden = false; }
+/* the random surprise after a session: more likely if you haven't played today */
+function speedChance(){ return S.speedDay === dstr() ? 0.15 : 0.4; }
+
 /* ---------- finish: celebration screens ---------- */
 function fanfare(big){
   if (!S.settings.sfx) return;
@@ -1315,12 +1450,20 @@ function finish(){
       routeMap(),
       Q.bandUp ? h('div', { class:'levels' }, bandRow(Q.bandUp.band, true), h('p', { class:'small' }, BANDS[Q.bandUp.band] + ' went from ' + Q.bandUp.p0 + '% to ' + Q.bandUp.p1 + '%.')) : null);
   });
+  /* surprise speed round, at random */
+  const surprise = passed && Math.random() < speedChance() && speedPool().length >= 8;
   /* 5. level up */
   if (lvUp) screens.push(() => { confetti(false); fanfare(true);
     return h('div', { class:'done-card center' }, h('div', { class:'medal lv-medal' }, h('span', {}, 'Lv'), h('b', {}, String(userLevel()))),
       h('p', { class:'eyebrow' }, 'Nuevo nivel · level up'), h('h2', {}, 'You reached level ' + userLevel()),
       h('p', { class:'done-note' }, levelSpan().need + ' XP to level ' + (userLevel() + 1) + '.')); });
 
+  if (surprise){ const sc = () => { setTimeout(() => solPlay(document.querySelector('#done .sol'), 'cheer', 1200), 200);
+      return h('div', { class:'done-card center' }, h('div', { class:'done-sol' }, solEl('bounce')),
+        h('p', { class:'eyebrow' }, '¡Sorpresa! · surprise'), h('h2', {}, 'Speed round?'),
+        h('p', { class:'done-note' }, SPEED_SECS + ' seconds to match as many pairs as you can. Your best: ' + (S.speedBest || 0) + '.'),
+        h('button', { class:'btn secondary wide', type:'button', onclick:() => { Q = null; startSpeed(); } }, '⚡ Play now')); };
+    sc.skip = 'Not now'; screens.push(sc); }
   let si = 0;
   const done = $('#done');
   const paint = () => {
@@ -1330,8 +1473,8 @@ function finish(){
     node.classList.add('pop');
     done.append(node,
       screens.length > 1 ? h('div', { class:'dots', 'aria-hidden':'true' }, screens.map((_, i) => h('span', { class: i === si ? 'on' : '' }))) : null,
-      h('button', { class:'btn primary wide', type:'button', id:'done-btn', onclick:() => {
-        if (!last){ si++; paint(); window.scrollTo(0,0); } else { Q = null; renderHome(); show('home'); } } }, last ? 'Continue' : 'Next'));
+      h('button', { class:'btn ' + (screens[si].skip ? 'ghost' : 'primary') + ' wide', type:'button', id:'done-btn', onclick:() => {
+        if (!last){ si++; paint(); window.scrollTo(0,0); } else { Q = null; renderHome(); show('home'); } } }, screens[si].skip || (last ? 'Continue' : 'Next')));
     setTimeout(() => { const b = $('#done-btn'); if (b) b.focus(); }, 50);
   };
   show('done'); paint();
@@ -1587,6 +1730,10 @@ function settingsNodes(){
     (() => { const inp = h('input', { id:'set-name', class:'answer', type:'text', maxlength:'24', autocomplete:'given-name', placeholder:'Your first name', value:S.settings.name || '' });
       inp.addEventListener('change', () => { S.settings.name = inp.value.trim(); save(); renderHome(); });
       return h('div', { class:'field' }, h('label', { for:'set-name' }, 'Your name'), inp, h('p', { class:'small' }, 'Shown as your profile picture. Leave it empty to use Sol.')); })(),
+    h('div', { class:'field' }, h('span', { class:'lbl' }, 'Colours'),
+      h('div', { class:'palettes', role:'group', 'aria-label':'Colour theme' }, PALETTES.map(([id, name, sw]) =>
+        h('button', { class:'pal', type:'button', 'aria-pressed': String((S.settings.palette || 'mango') === id), onclick:() => setPalette(id) },
+          h('span', { class:'pal-sw', 'aria-hidden':'true' }, sw.map(c => h('span', { style:'background:' + c }))), h('b', {}, name))))),
     h('div', { class:'field' }, h('span', { class:'lbl' }, 'Appearance'), seg, h('p', { class:'small' }, 'Auto follows your phone or computer.')),
     (() => { const all = esVoices();
       const sel = h('select', { id:'set-voice' }, all.map(v => h('option', { value:vid(v), selected: VOICE && vid(v) === vid(VOICE) }, vLabel(v))));
@@ -1610,7 +1757,7 @@ function settingsNodes(){
       catch(e){ code.select(); status.textContent = 'Press Ctrl+C or Cmd+C to copy.'; } } }, 'Copy backup code'),
     restore, h('button', { class:'btn small soft', type:'button', onclick:() => {
       try { const o = JSON.parse(decodeURIComponent(escape(atob(restore.value.trim())))); if (!o || !o.srs) throw 0;
-        adopt(o); save(); applyTheme(S.settings.theme); renderHome(); status.textContent = 'Progress restored.'; }
+        adopt(o); save(); applyTheme(S.settings.theme); applyPalette(S.settings.palette); renderHome(); status.textContent = 'Progress restored.'; }
       catch(e){ status.textContent = 'That code didn\'t work. Copy the whole code and try again.'; } } }, 'Restore from code'),
     status,
     h('h3', {}, 'Start over'),
@@ -1621,7 +1768,8 @@ function settingsNodes(){
 /* ---------- boot ---------- */
 function boot(){
   load();
-  applyTheme(S.settings.theme);
+  if (!S.settings.mangoSet){ S.settings.palette = 'mango'; S.settings.mangoSet = true; save(); }   /* Mango is the chosen look */
+  applyTheme(S.settings.theme); applyPalette(S.settings.palette);
   if (darkMQ) (darkMQ.addEventListener ? darkMQ.addEventListener('change', () => { syncThemeColor(); if (!$('#home').hidden) renderHome(); }) : darkMQ.addListener(syncThemeColor));
   pickVoice();
   [300, 1000, 2500, 5000].forEach(t => setTimeout(() => { const before = VOICE && vid(VOICE); pickVoice(); pickEnVoice(); if ((VOICE && vid(VOICE)) !== before && !$('#home').hidden && (TAB === 'listen' || TAB === 'me')) renderHome(); }, t));
@@ -1633,7 +1781,7 @@ function boot(){
   $('#sheet').addEventListener('click', e => { if (e.target.id === 'sheet') closeSheet(); });
   $('#close-lesson').addEventListener('click', () => { $('#quit').hidden = false; $('#quit-keep').focus(); });
   $('#quit-keep').addEventListener('click', () => $('#quit').hidden = true);
-  $('#quit-go').addEventListener('click', () => { save(); Q = null; renderHome(); show('home'); });
+  $('#quit-go').addEventListener('click', () => { stopSpeed(); save(); Q = null; renderHome(); show('home'); });
   document.addEventListener('keydown', e => {
     if (!$('#sheet').hidden){ if (e.key === 'Escape') closeSheet(); return; }
     if (!Q || $('#lesson').hidden) return;
